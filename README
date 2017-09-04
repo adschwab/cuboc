@@ -1,0 +1,18 @@
+Setup:
+
+MAC:
+  Install xcode
+
+Install glfw from website
+  Run cmake
+  Run make
+  Run make install
+
+Install glew from website
+  Run make install
+
+------------------------------------
+Compile:
+
+MAC:
+g++ engine.cc loadfile.cc -lglfw -lGLEW -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
