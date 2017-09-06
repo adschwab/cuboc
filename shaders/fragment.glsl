@@ -3,11 +3,11 @@ out vec4 color;
 
 in vec2 texCoords;
 
-uniform float incolor1;
-uniform float incolor2;
+uniform sampler2D texture1;
+uniform sampler2D texture2;
 
 void main()
 {
-  color = vec4(0.0, incolor1, incolor2, 0.0);
+  color = mix(texture(texture1, texCoords), texture(texture2, texCoords), 0.5);
 }
 

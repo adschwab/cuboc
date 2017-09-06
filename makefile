@@ -11,7 +11,7 @@ make: pre engine
 pre:
 	@mkdir -p $(OBJ)
 
-engine: $(OBJ)/engine.o $(OBJ)/loadfile.o $(OBJ)/programloader.o $(OBJ)/image_loader.o  $(OBJ)/buffer.o
+engine: $(OBJ)/engine.o $(OBJ)/window.o $(OBJ)/loadfile.o $(OBJ)/programloader.o $(OBJ)/image_loader.o  $(OBJ)/buffer.o
 	$(CC) -o $@ $^ $(GLFW) $(GL)
 
 $(OBJ)/loadfile.o: util/loadfile.cc
@@ -24,6 +24,9 @@ $(OBJ)/image_loader.o: loader/image_loader.cc
 	$(CC) -o $@ -c $^ $(CFLAGS)
 
 $(OBJ)/buffer.o: loader/buffer.cc
+	$(CC) -o $@ -c $^ $(CFLAGS)
+
+$(OBJ)/window.o: window.cc
 	$(CC) -o $@ -c $^ $(CFLAGS)
 
 $(OBJ)/engine.o: engine.cc

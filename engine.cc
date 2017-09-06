@@ -5,8 +5,10 @@
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 
+#include "window.h"
 #include "loader/programloader.h"
 #include "loader/buffer.h"
 #include "loader/image_loader.h"
@@ -19,7 +21,8 @@ GLuint VAO[2];
 GLuint VBO[2];
 GLuint EBO[2];
 
-unsigned int texture;
+unsigned int texture1;
+unsigned int texture2;
 
 static void err_callback(int error, const char* description) {
 #ifndef RELEASE  
@@ -33,9 +36,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
   }
 }
 
-void initGL(GLFWwindow* window) {
-
-  glfwMakeContextCurrent(window);
+void initGL(base::Window window) {
 
   glewExperimental = true;
   if (glewInit() != GLEW_OK) {
@@ -43,11 +44,26 @@ void initGL(GLFWwindow* window) {
     std::exit(EXIT_FAILURE);
   }
 
-  glfwSetKeyCallback(window, key_callback);
+  glfwSetKeyCallback(window.getWindow(), key_callback);
  
-  int width, height;
-  glfwGetFramebufferSize(window, &width, &height);
-  glViewport(0, 0, width, height);
+  glViewport(0, 0, window.getWidth(), window.getHeight());
+
+  // ---------------- SETUP PROGRAMS -----------------
+  programs.push_back(
+      graphicsutils::ProgramLoader(
+          "shaders/vertex.glsl",
+          "shaders/fragment.glsl"));
+  programs.push_back(
+      graphicsutils::ProgramLoader(
+          "shaders/vertex_color.glsl",
+          "shaders/fragment_color.glsl"));
+
+  // ---------------- INITIALIZE BUFFERS --------------
+
+  glGenBuffers(2, EBO);
+  glGenBuffers(2, VBO);  
+  glGenVertexArrays(2, VAO);
+
 
   GLfloat vertices[] = {
       0.5f,  0.5f, 0.0f,  1.0f, 1.0f,
@@ -73,8 +89,18 @@ void initGL(GLFWwindow* window) {
       0.5f, 1.0f   // top-center corner
   };
 
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
+
+  // -------------------- SETUP TEXTURES -----------------------
+  glGenTextures(1, &texture1);
+  glBindTexture(GL_TEXTURE_2D, texture1);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  
+  Loader::Image container = 
+      Loader::Image("textures/container.jpg", 3);
   Loader::Image brick_wall = 
       Loader::Image("textures/brick_wall.jpg", 3);
  
@@ -85,19 +111,22 @@ void initGL(GLFWwindow* window) {
       brick_wall.getHeight(), 
       0, GL_RGB, GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
+  
+  glGenTextures(1, &texture2);
+  glBindTexture(GL_TEXTURE_2D, texture2);
+  
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  programs.push_back(
-      graphicsutils::ProgramLoader(
-          "shaders/vertex.glsl",
-          "shaders/fragment.glsl"));
-  programs.push_back(
-      graphicsutils::ProgramLoader(
-          "shaders/vertex_color.glsl",
-          "shaders/fragment_color.glsl"));
-
-  glGenBuffers(2, EBO);
-  glGenBuffers(2, VBO);  
-  glGenVertexArrays(2, VAO);
+  data = (void *)container.getBuffer();
+  glTexImage2D(GL_TEXTURE_2D, 0, 
+      GL_RGB, 
+      container.getWidth(), 
+      container.getHeight(), 
+      0, GL_RGB, GL_UNSIGNED_BYTE, data);
+  glGenerateMipmap(GL_TEXTURE_2D);
 
   // ---------------- GENERATE RECTANGLE -----------------
   glBindVertexArray(VAO[0]);
@@ -135,35 +164,18 @@ void initGL(GLFWwindow* window) {
 
 int main(int argc, char** argv) {
 
-  GLFWwindow* window;
+  base::Window window = base::Window(800, 600, "Window Fun");
   glfwSetErrorCallback(err_callback);
-  if (!glfwInit()) {
-    std::fprintf(stderr, "Fatal Error initializing glfw. Aborting.\n");
-    exit(EXIT_FAILURE);
-  }
 
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-  
-  GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-  const GLFWvidmode* currentMode = glfwGetVideoMode(monitor);
-  std::printf("width: %d\nheight: %d\nfps: %d\n", currentMode->width, currentMode->height, currentMode->refreshRate);
-  
-  window = glfwCreateWindow(800, 600, "Window fun", NULL, NULL);
-  if (!window) {
-    std::fprintf(stderr, "Fatal Error initializing monitor. Aborting.\n");
-    exit(EXIT_FAILURE);
-  }
-  
   initGL(window);
 
+  programs[0].use();
+  programs[0].setInt("texture1", 0);
+  programs[0].setInt("texture2", 1);
   
   
   std::printf("Running\n");
-  while (!glfwWindowShouldClose(window)) {
+  while (!glfwWindowShouldClose(window.getWindow())) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -171,11 +183,25 @@ int main(int argc, char** argv) {
     int index = (int) (sin(time) / 2 + 1.0);   
     programs[index].use();
     if (index == 0) {
-      GLfloat color1 = (sin(time) / 2) + 0.5;
-      GLfloat color2 = (sin(time + PI) / 2) + 0.5;
-
-      programs[index].setFloat("incolor1", color1);
-      programs[index].setFloat("incolor2", color2);
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, texture1);
+      glActiveTexture(GL_TEXTURE1);
+      glBindTexture(GL_TEXTURE_2D, texture2);
+     
+      glm::mat4 model;
+      model = glm::rotate(
+          model,
+          glm::radians(-55.0f),
+          glm::vec3(1.0f, 0.0f, 0.0f));
+      glm::mat4 view;
+      view = glm::translate(
+          view,
+          glm::vec3(0.0f, 0.0f, -3.0f));
+      glm::mat4 proj = glm::perspective(
+          glm::radians(45.0f),
+          (float)window.getWidth()/(float)window.getHeight(),
+          0.1f,
+          100.0f);
 
       glBindVertexArray(VAO[index]);
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -188,7 +214,7 @@ int main(int argc, char** argv) {
     glUseProgram(0);
 
     glfwSwapInterval(1);
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(window.getWindow());
     glfwPollEvents();
   }
 
