@@ -24,6 +24,8 @@ GLuint EBO[2];
 unsigned int texture1;
 unsigned int texture2;
 
+glm::mat4 model;
+
 static void err_callback(int error, const char* description) {
 #ifndef RELEASE  
   std::fprintf(stderr, "Error: %s\n", description);
@@ -66,10 +68,14 @@ void initGL(base::Window window) {
 
 
   GLfloat vertices[] = {
-      0.5f,  0.5f, 0.0f,  1.0f, 1.0f,
-      0.5f, -0.5f, 0.0f,  1.0f, 0.0f,
-     -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 
-     -0.5f,  0.5f, 0.0f,  0.0f, 1.0f 
+      0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
+      0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,   0.0f, 0.0f, 
+     -0.5f,  0.5f,  0.5f,   0.0f, 1.0f,
+      0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,   1.0f, 0.0f,
+     -0.5f, -0.5f, -0.5f,   0.0f, 0.0f, 
+     -0.5f,  0.5f, -0.5f,   0.0f, 1.0f 
   };
 
   GLfloat vertices2[] = {
@@ -80,7 +86,16 @@ void initGL(base::Window window) {
 
   GLuint indices[] = {
       0, 1, 3,
-      1, 2, 3
+      1, 2, 3,
+      
+      4, 5, 7,
+      5, 6, 7,
+
+      0, 1, 4,
+      1, 4, 5,
+
+      2, 3, 6,
+      3, 6, 7
   };
 
   float texCoords[] = {
@@ -128,6 +143,29 @@ void initGL(base::Window window) {
       0, GL_RGB, GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
 
+  programs[0].use();
+  programs[0].setInt("texture1", 0);
+  programs[0].setInt("texture2", 1);
+
+  // --------------- Transformation matrices -----------------
+  model = glm::rotate(
+      model,
+      glm::radians(-55.0f),
+      glm::vec3(1.0f, 0.0f, 0.0f));
+  glm::mat4 view;
+  view = glm::translate(
+      view,
+      glm::vec3(0.0f, 0.0f, -3.0f));
+  glm::mat4 proj = glm::perspective(
+      glm::radians(45.0f),
+      (float)window.getWidth()/(float)window.getHeight(),
+      0.1f,
+      100.0f);
+  
+  programs[0].setMatrix("projection", proj);
+  programs[0].setMatrix("view", view);
+  programs[0].setMatrix("model", model);
+
   // ---------------- GENERATE RECTANGLE -----------------
   glBindVertexArray(VAO[0]);
   glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
@@ -168,16 +206,13 @@ int main(int argc, char** argv) {
   glfwSetErrorCallback(err_callback);
 
   initGL(window);
-
-  programs[0].use();
-  programs[0].setInt("texture1", 0);
-  programs[0].setInt("texture2", 1);
   
   
   std::printf("Running\n");
   while (!glfwWindowShouldClose(window.getWindow())) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
 
     GLfloat time = glfwGetTime();
     int index = (int) (sin(time) / 2 + 1.0);   
@@ -187,24 +222,15 @@ int main(int argc, char** argv) {
       glBindTexture(GL_TEXTURE_2D, texture1);
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_2D, texture2);
-     
-      glm::mat4 model;
+
       model = glm::rotate(
-          model,
-          glm::radians(-55.0f),
-          glm::vec3(1.0f, 0.0f, 0.0f));
-      glm::mat4 view;
-      view = glm::translate(
-          view,
-          glm::vec3(0.0f, 0.0f, -3.0f));
-      glm::mat4 proj = glm::perspective(
-          glm::radians(45.0f),
-          (float)window.getWidth()/(float)window.getHeight(),
-          0.1f,
-          100.0f);
+          model, 
+          glm::radians(0.02f), 
+          glm::vec3(1.0f, 0.3f, 0.5f));
+      programs[0].setMatrix("model", model);
 
       glBindVertexArray(VAO[index]);
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
     }
     else {
       glBindVertexArray(VAO[index]);

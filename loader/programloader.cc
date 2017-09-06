@@ -3,6 +3,8 @@
 #include <string>
 #include <cstdlib>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
 
 #include "util/loadfile.h"
@@ -29,6 +31,13 @@ void ProgramLoader::setInt(const std::string &name, int value) const {
 void ProgramLoader::setFloat(const std::string &name, float value) const {
   GLint loc = glGetUniformLocation(progid, name.c_str());
   glUniform1f(loc, value);
+}
+
+void ProgramLoader::setMatrix(
+    const std::string &name,
+    glm::mat4 mat) const {
+  GLint loc = glGetUniformLocation(progid, name.c_str());
+  glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 std::string ProgramLoader::load(GLuint& program) {
