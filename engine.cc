@@ -17,12 +17,11 @@
 
 std::vector<graphicsutils::ProgramLoader> programs;
 
-GLuint VAO[2];
-GLuint VBO[2];
-GLuint EBO[2];
+GLuint VAO[1];
+GLuint VBO[1];
+GLuint EBO[1];
 
 unsigned int texture1;
-unsigned int texture2;
 
 glm::mat4 model;
 
@@ -62,40 +61,52 @@ void initGL(base::Window window) {
 
   // ---------------- INITIALIZE BUFFERS --------------
 
-  glGenBuffers(2, EBO);
-  glGenBuffers(2, VBO);  
-  glGenVertexArrays(2, VAO);
+  glGenBuffers(1, EBO);
+  glGenBuffers(1, VBO);  
+  glGenVertexArrays(1, VAO);
 
+  float vertices[] = {
+      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+       0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-  GLfloat vertices[] = {
-      0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
-      0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
-     -0.5f, -0.5f,  0.5f,   0.0f, 0.0f, 
-     -0.5f,  0.5f,  0.5f,   0.0f, 1.0f,
-      0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
-      0.5f, -0.5f, -0.5f,   1.0f, 0.0f,
-     -0.5f, -0.5f, -0.5f,   0.0f, 0.0f, 
-     -0.5f,  0.5f, -0.5f,   0.0f, 1.0f 
-  };
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-  GLfloat vertices2[] = {
-     -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-      0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-      0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-  };
+      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-  GLuint indices[] = {
-      0, 1, 3,
-      1, 2, 3,
-      
-      4, 5, 7,
-      5, 6, 7,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-      0, 1, 4,
-      1, 4, 5,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-      2, 3, 6,
-      3, 6, 7
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
   };
 
   float texCoords[] = {
@@ -116,26 +127,8 @@ void initGL(base::Window window) {
   
   Loader::Image container = 
       Loader::Image("textures/container.jpg", 3);
-  Loader::Image brick_wall = 
-      Loader::Image("textures/brick_wall.jpg", 3);
- 
-  void *data = (void *)brick_wall.getBuffer();
-  glTexImage2D(GL_TEXTURE_2D, 0, 
-      GL_RGB, 
-      brick_wall.getWidth(), 
-      brick_wall.getHeight(), 
-      0, GL_RGB, GL_UNSIGNED_BYTE, data);
-  glGenerateMipmap(GL_TEXTURE_2D);
-  
-  glGenTextures(1, &texture2);
-  glBindTexture(GL_TEXTURE_2D, texture2);
-  
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  data = (void *)container.getBuffer();
+   
+  void *data = (void *)container.getBuffer();
   glTexImage2D(GL_TEXTURE_2D, 0, 
       GL_RGB, 
       container.getWidth(), 
@@ -145,7 +138,6 @@ void initGL(base::Window window) {
 
   programs[0].use();
   programs[0].setInt("texture1", 0);
-  programs[0].setInt("texture2", 1);
 
   // --------------- Transformation matrices -----------------
   model = glm::rotate(
@@ -171,8 +163,6 @@ void initGL(base::Window window) {
   glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 
       5 * sizeof(float),
       (GLvoid*)0);
@@ -182,20 +172,6 @@ void initGL(base::Window window) {
   
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
-  glBindVertexArray(0);
-
-
-  // --------------- GENERATE TRIANGLE -------------------
-  glBindVertexArray(VAO[1]);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)0);  
-  glEnableVertexAttribArray(0);
-
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*) (3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
-
   glBindVertexArray(0);
 
 }
@@ -215,27 +191,19 @@ int main(int argc, char** argv) {
     glEnable(GL_DEPTH_TEST);
 
     GLfloat time = glfwGetTime();
-    int index = (int) (sin(time) / 2 + 1.0);   
-    programs[index].use();
-    if (index == 0) {
-      glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, texture1);
-      glActiveTexture(GL_TEXTURE1);
-      glBindTexture(GL_TEXTURE_2D, texture2);
+    programs[0].use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
 
-      model = glm::rotate(
-          model, 
-          glm::radians(0.02f), 
-          glm::vec3(1.0f, 0.3f, 0.5f));
-      programs[0].setMatrix("model", model);
+    model = glm::rotate(
+        model, 
+        glm::radians(0.02f), 
+        glm::vec3(1.0f, 0.3f, 0.5f));
+    programs[0].setMatrix("model", model);
 
-      glBindVertexArray(VAO[index]);
-      glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
-    }
-    else {
-      glBindVertexArray(VAO[index]);
-      glDrawArrays(GL_TRIANGLES, 0, 3);
-    }
+    glBindVertexArray(VAO[0]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    
     glBindVertexArray(0);
     glUseProgram(0);
 
@@ -245,9 +213,9 @@ int main(int argc, char** argv) {
   }
 
   
-  glDeleteVertexArrays(2, VAO);
-  glDeleteBuffers(2, VBO);
-  glDeleteBuffers(2, EBO);
+  glDeleteVertexArrays(1, VAO);
+  glDeleteBuffers(1, VBO);
+  glDeleteBuffers(1, EBO);
   glfwTerminate();
   
   std::printf("Terminating\n");
