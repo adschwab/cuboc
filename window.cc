@@ -25,7 +25,7 @@ namespace base {
         GLFW_OPENGL_PROFILE, 
         GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
+    glfwWindowHint(GLFW_CURSOR_DISABLED, GL_TRUE);
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* currentMode = glfwGetVideoMode(
         monitor);
