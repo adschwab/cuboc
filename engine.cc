@@ -7,15 +7,13 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <GLFW/glfw3.h>
 
 #include "window.h"
+#include "camera.h"
 #include "loader/programloader.h"
 #include "loader/image_loader.h"
 
-#define PI 3.14159265
 
 int target_fps = 30;
 GLfloat loop_time = 1/(float)target_fps;
@@ -36,24 +34,10 @@ bool mouse_set = false;
 float sensitivity = 5;
 
 glm::mat4 model;
-glm::mat4 view;
 glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f);
 
-glm::vec3 cam_pos = glm::vec3(0.0f, 1.0f, 2.0f);
-glm::vec3 origin_angle = glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f));
-glm::vec3 cam_angle = glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f));
-
-float h_angle;
-float v_angle;
-
-
-float h_theta(glm::vec3 origin, glm::vec3 dir) {
-  float cos_angle = glm::dot(dir, origin);
-  float mult = 1.0;
-  if (dir[0] < 0)
-    mult = -1.0;
-  return glm::acos(cos_angle) * mult;
-}
+glm::vec3 cam_pos = glm::vec3(0.0f, 0.0f, 0.0f);
+Camera camera = Camera(cam_pos, 0.0f, 0.0f);
 
 static void err_callback(
     int error,
@@ -63,73 +47,29 @@ static void err_callback(
 #endif
 }
 
-glm::quat rotation(glm::vec3 start, glm::vec3 dest){
-
-  float cosTheta = glm::dot(start, dest);
-  glm::vec3 rotationAxis;
-  if (cosTheta < -1 + 0.00001f){
-    rotationAxis = glm::cross(
-        glm::vec3(0.0f, 0.0f, 1.0f), start);
-    if (length2(rotationAxis) < 0.00001 )
-      rotationAxis = glm::cross(
-          glm::vec3(1.0f, 0.0f, 0.0f), start);
-    rotationAxis = glm::normalize(rotationAxis);
-    return glm::angleAxis(
-        glm::radians(180.0f), rotationAxis);
-  }
-  rotationAxis = glm::cross(start, dest);
-  float s = glm::sqrt( (1+cosTheta)*2 );
-  float invs = 1 / s;
-  return glm::quat(
-      s * 0.5f, 
-      rotationAxis.x * invs,
-      rotationAxis.y * invs,
-      rotationAxis.z * invs);
-}
-
-void update_view() {
-  view = glm::mat4();
-  glm::vec3 pos = cam_pos;
-  pos[1] = -pos[1];
-  
-  view = glm::translate(view, pos);
-  float xang = glm::sin(-h_angle);
-  float yang = glm::cos(-h_angle);
-  glm::vec3 angle = glm::vec3(xang, 0.0f, yang);
-  view = glm::toMat4(rotation(origin_angle, angle)) * view;
-  
-  yang = glm::cos(v_angle);
-  float zang = glm::sin(v_angle);
-  angle = glm::vec3(0.0f, zang, yang);
-  view = glm::toMat4(rotation(
-      glm::vec3(0.0f, 0.0f, 1.0f), angle)) * view;
-
-}
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+  glm::vec3 pos = camera.getPosition();
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
   }
   else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-    cam_pos[2] -= 0.1f * glm::cos(h_angle);
-    cam_pos[0] -= 0.1f * glm::sin(h_angle);
-    update_view();
+    pos[2] -= 0.1f * glm::cos(camera.getXY());
+    pos[0] -= 0.1f * glm::sin(camera.getXY());
   }
   else if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-    cam_pos[2] += 0.1f * glm::cos(h_angle);
-    cam_pos[0] += 0.1f * glm::sin(h_angle);
-    update_view();
+    pos[2] += 0.1f * glm::cos(camera.getXY());
+    pos[0] += 0.1f * glm::sin(camera.getXY());
   }
   else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-    cam_pos[2] += 0.1f * glm::sin(h_angle);
-    cam_pos[0] -= 0.1f * glm::cos(h_angle);
-    update_view();
+    pos[2] += 0.1f * glm::sin(camera.getXY());
+    pos[0] -= 0.1f * glm::cos(camera.getXY());
   }
   else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-    cam_pos[2] -= 0.1f * glm::sin(h_angle);
-    cam_pos[0] += 0.1f * glm::cos(h_angle);
-    update_view();
+    pos[2] -= 0.1f * glm::sin(camera.getXY());
+    pos[0] += 0.1f * glm::cos(camera.getXY());
   }
+  camera.setPosition(pos);
 }
 
 static void cursor_pos_callback(GLFWwindow* _window, 
@@ -144,15 +84,8 @@ static void cursor_pos_callback(GLFWwindow* _window,
     mouse_set = true;
     return;
   }
-
-  double norm = std::sqrt(xdiff * xdiff + ydiff * ydiff);
-  h_angle = h_angle - xdiff * PI/(180.0f * sensitivity);
-  v_angle = glm::max(
-      glm::min(
-        v_angle - ydiff * PI/(180.0f * sensitivity),
-        PI/2.0f),
-      -PI/2.0f);
-  update_view();
+  
+  camera.updateAngles(xdiff, ydiff, sensitivity);
 }
 
 void initGL(base::Window window) {
@@ -261,10 +194,6 @@ void initGL(base::Window window) {
       glm::radians(0.0f),
       glm::vec3(1.0f, 0.0f, 0.0f));
   
-  h_angle = h_theta(origin_angle, cam_angle); 
-  v_angle = -0.3f;
-  update_view();
-  
   glm::mat4 proj = glm::perspective(
       glm::radians(45.0f),
       (float)window.getWidth()/(float)window.getHeight(),
@@ -272,7 +201,7 @@ void initGL(base::Window window) {
       100.0f);
   
   programs[0].setMatrix("projection", proj);
-  programs[0].setMatrix("view", view);
+  programs[0].setMatrix("view", camera.getView());
   programs[0].setMatrix("model", model);
 
   // ---------------- GENERATE RECTANGLE -----------------
@@ -312,7 +241,7 @@ int main(int argc, char** argv) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
 
-    programs[0].setMatrix("view", view);
+    programs[0].setMatrix("view", camera.getView());
     glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     
