@@ -39,20 +39,21 @@ glm::mat4 model;
 glm::mat4 view;
 glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f);
 
-glm::vec3 cam_pos = glm::vec3(0.0f, 0.0f, 2.0f);
+glm::vec3 cam_pos = glm::vec3(0.0f, 1.0f, 2.0f);
 glm::vec3 origin_angle = glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f));
 glm::vec3 cam_angle = glm::normalize(glm::vec3(0.0f, 0.0f, 1.0f));
 
-float theta() {
-  float cos_angle = glm::dot(cam_angle, origin_angle);
+float h_angle;
+float v_angle;
+
+
+float h_theta(glm::vec3 origin, glm::vec3 dir) {
+  float cos_angle = glm::dot(dir, origin);
   float mult = 1.0;
-  if (cam_angle[0] < 0)
+  if (dir[0] < 0)
     mult = -1.0;
   return glm::acos(cos_angle) * mult;
 }
-
-
-float h_angle;
 
 static void err_callback(
     int error,
@@ -96,6 +97,13 @@ void update_view() {
   float yang = glm::cos(-h_angle);
   glm::vec3 angle = glm::vec3(xang, 0.0f, yang);
   view = glm::toMat4(rotation(origin_angle, angle)) * view;
+  
+  yang = glm::cos(v_angle);
+  float zang = glm::sin(v_angle);
+  angle = glm::vec3(0.0f, zang, yang);
+  view = glm::toMat4(rotation(
+      glm::vec3(0.0f, 0.0f, 1.0f), angle)) * view;
+
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -139,6 +147,11 @@ static void cursor_pos_callback(GLFWwindow* _window,
 
   double norm = std::sqrt(xdiff * xdiff + ydiff * ydiff);
   h_angle = h_angle - xdiff * PI/(180.0f * sensitivity);
+  v_angle = glm::max(
+      glm::min(
+        v_angle - ydiff * PI/(180.0f * sensitivity),
+        PI/2.0f),
+      -PI/2.0f);
   update_view();
 }
 
@@ -248,7 +261,8 @@ void initGL(base::Window window) {
       glm::radians(0.0f),
       glm::vec3(1.0f, 0.0f, 0.0f));
   
-  h_angle = theta(); 
+  h_angle = h_theta(origin_angle, cam_angle); 
+  v_angle = -0.3f;
   update_view();
   
   glm::mat4 proj = glm::perspective(
