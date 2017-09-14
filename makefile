@@ -11,7 +11,7 @@ make: pre engine
 pre:
 	@mkdir -p $(OBJ)
 
-engine: $(OBJ)/engine.o $(OBJ)/window.o $(OBJ)/camera.o  $(OBJ)/loadfile.o $(OBJ)/programloader.o $(OBJ)/image_loader.o  $(OBJ)/buffer.o
+engine: $(OBJ)/engine.o $(OBJ)/window.o $(OBJ)/movement.o $(OBJ)/camera.o  $(OBJ)/loadfile.o $(OBJ)/programloader.o $(OBJ)/image_loader.o  $(OBJ)/buffer.o
 	$(CC) -o $@ $^ $(GLFW) $(GL)
 
 $(OBJ)/loadfile.o: util/loadfile.cc
@@ -27,6 +27,9 @@ $(OBJ)/buffer.o: loader/buffer.cc
 	$(CC) -o $@ -c $^ $(CFLAGS)
 
 $(OBJ)/camera.o: camera.cc
+	$(CC) -o $@ -c $^ $(CFLAGS)
+
+$(OBJ)/movement.o: movement.cc
 	$(CC) -o $@ -c $^ $(CFLAGS)
 
 $(OBJ)/window.o: window.cc

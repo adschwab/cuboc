@@ -9,7 +9,8 @@ namespace base {
   Window::Window(int width, int height, std::string title):
       _width(width), 
       _height(height),
-      _title(title){
+      _title(title),
+      has_focus(true){
 
     if (!glfwInit()) {
       std::fprintf(
@@ -50,6 +51,14 @@ namespace base {
     
     glfwMakeContextCurrent(_window);
     glfwGetFramebufferSize(_window, &_width, &_height);
+  }
+
+  bool Window::getFocus() {
+    return has_focus;
+  }
+
+  void Window::setFocus(bool focus) {
+    has_focus = focus;
   }
 
   GLFWwindow *Window::getWindow() {

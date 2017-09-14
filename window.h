@@ -14,12 +14,15 @@ class Window {
   int getWidth();
   int getHeight();
   GLFWwindow* getWindow();
+  bool getFocus();
+  void setFocus(bool focus);
 
   private:
   GLFWwindow* _window;
   std::string _title;
   int _width;
   int _height;
+  bool has_focus;
 };
 
 } // namespace

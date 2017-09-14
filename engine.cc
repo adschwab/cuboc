@@ -11,6 +11,7 @@
 
 #include "window.h"
 #include "camera.h"
+#include "movement.h"
 #include "loader/programloader.h"
 #include "loader/image_loader.h"
 
@@ -26,18 +27,29 @@ GLuint EBO[1];
 
 unsigned int texture1;
 
-base::Window window = base::Window(800, 600, "Window Fun");
+base::Window window = base::Window(1000, 600, "Window Fun");
+
 
 double mouseX = window.getWidth()/2;
 double mouseY = window.getHeight()/2;
 bool mouse_set = false;
 float sensitivity = 5;
 
-glm::mat4 model;
-glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f);
-
-glm::vec3 cam_pos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 cam_pos = glm::vec3(0.0f, 2.0f, 0.0f);
 Camera camera = Camera(cam_pos, 0.0f, 0.0f);
+Movement movement = Movement(&camera);
+
+glm::vec3 positions[] = {
+    glm::vec3(0.0f, 0.0f, 3.0f),
+    glm::vec3(0.0f, 0.0f, 4.0f),
+    glm::vec3(0.0f, 0.0f, 5.0f),
+    glm::vec3(0.0f, 1.0f, 3.0f),
+    glm::vec3(1.0f, 0.0f, 3.0f),
+    glm::vec3(1.0f, 0.0f, 4.0f),
+    glm::vec3(1.0f, 0.0f, 5.0f)
+};
+
+int num_positions = 7;
 
 static void err_callback(
     int error,
@@ -47,29 +59,31 @@ static void err_callback(
 #endif
 }
 
+static void focus_callback(GLFWwindow* _window, int focused) {
+  window.setFocus((bool)focused);
+}
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  glm::vec3 pos = camera.getPosition();
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, GLFW_TRUE);
   }
-  else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-    pos[2] -= 0.1f * glm::cos(camera.getXY());
-    pos[0] -= 0.1f * glm::sin(camera.getXY());
-  }
-  else if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-    pos[2] += 0.1f * glm::cos(camera.getXY());
-    pos[0] += 0.1f * glm::sin(camera.getXY());
-  }
-  else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-    pos[2] += 0.1f * glm::sin(camera.getXY());
-    pos[0] -= 0.1f * glm::cos(camera.getXY());
-  }
-  else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-    pos[2] -= 0.1f * glm::sin(camera.getXY());
-    pos[0] += 0.1f * glm::cos(camera.getXY());
-  }
-  camera.setPosition(pos);
+  else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+    movement.setBackward(true);
+  else if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE)
+    movement.setBackward(false);
+  else if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+    movement.setForward(true);
+  else if (key == GLFW_KEY_UP && action == GLFW_RELEASE)
+    movement.setForward(false);
+  else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+    movement.setRight(true);
+  else if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE)
+    movement.setRight(false);
+  else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+    movement.setLeft(true);
+  else if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE)
+    movement.setLeft(false); 
+
 }
 
 static void cursor_pos_callback(GLFWwindow* _window, 
@@ -187,12 +201,7 @@ void initGL(base::Window window) {
 
   // --------------- Transformation matrices -----------------
   
-  model = glm::translate(model, -position);
-  
-  model = glm::rotate(
-      model,
-      glm::radians(0.0f),
-      glm::vec3(1.0f, 0.0f, 0.0f));
+
   
   glm::mat4 proj = glm::perspective(
       glm::radians(45.0f),
@@ -202,7 +211,7 @@ void initGL(base::Window window) {
   
   programs[0].setMatrix("projection", proj);
   programs[0].setMatrix("view", camera.getView());
-  programs[0].setMatrix("model", model);
+
 
   // ---------------- GENERATE RECTANGLE -----------------
   glBindVertexArray(VAO[0]);
@@ -223,16 +232,19 @@ void initGL(base::Window window) {
 }
 
 int main(int argc, char** argv) {
+  glfwSetWindowFocusCallback(window.getWindow(), focus_callback);
   glfwSetErrorCallback(err_callback);
   glfwSetKeyCallback(window.getWindow(), key_callback);
   glfwSetCursorPosCallback(window.getWindow(), cursor_pos_callback);
   glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 
   initGL(window);
   GLfloat lap_time = glfwGetTime();
   
   std::printf("Running\n");
   while (!glfwWindowShouldClose(window.getWindow())) {
+    movement.updatePosition();
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -243,8 +255,15 @@ int main(int argc, char** argv) {
 
     programs[0].setMatrix("view", camera.getView());
     glBindVertexArray(VAO[0]);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    
+    for (int i = 0; i < num_positions; i ++) {
+      glm::mat4 model;
+      glm::vec3 position = positions[i];
+      position[1] = -position[1]; 
+      model = glm::translate(model, -position);
+      programs[0].setMatrix("model", model);  
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    } 
+
     glBindVertexArray(0);
     glUseProgram(0);
     
@@ -252,7 +271,7 @@ int main(int argc, char** argv) {
     GLfloat render_time = time - lap_time;
     lap_time = time; 
 
-    if (render_time > loop_time) {
+    if (window.getFocus() && render_time > loop_time) {
       std::printf("Render took too long: %.3f\n",
           render_time);
     }
