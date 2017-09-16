@@ -237,21 +237,21 @@ int main(int argc, char** argv) {
   glfwSetKeyCallback(window.getWindow(), key_callback);
   glfwSetCursorPosCallback(window.getWindow(), cursor_pos_callback);
   glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
+  glfwWindowHint(GLFW_SAMPLES, 8);
 
   initGL(window);
   GLfloat lap_time = glfwGetTime();
-  
+  glEnable(GL_MULTISAMPLE);
+
   std::printf("Running\n");
   while (!glfwWindowShouldClose(window.getWindow())) {
     movement.updatePosition();
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-
+    
     programs[0].use();
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
 
     programs[0].setMatrix("view", camera.getView());
     glBindVertexArray(VAO[0]);
