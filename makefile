@@ -4,40 +4,29 @@ GL=-lGLEW -framework OpenGL
 CFLAGS=-I.
 OBJ=obj
 
+CXX_SRCS=$(shell find . ! -name "test_*.cc" -name "*.cc")
+CXX_OBJS=$(addprefix $(OBJ)/, ${CXX_SRCS:.cc=.o})
+
 .PHONY: clean pre make
 
 make: pre engine
 
 pre:
 	@mkdir -p $(OBJ)
+	@mkdir -p $(OBJ)/loader
+	@mkdir -p $(OBJ)/util
 
-engine: $(OBJ)/engine.o $(OBJ)/window.o $(OBJ)/movement.o $(OBJ)/camera.o  $(OBJ)/loadfile.o $(OBJ)/programloader.o $(OBJ)/image_loader.o  $(OBJ)/buffer.o
+engine: $(CXX_OBJS)
 	$(CC) -o $@ $^ $(GLFW) $(GL)
 
-$(OBJ)/loadfile.o: util/loadfile.cc
-	$(CC) -o $@ -c $^ $(CFLAGS)
-
-$(OBJ)/programloader.o: loader/programloader.cc
-	$(CC) -o $@ -c $^ $(CFLAGS)
-
-$(OBJ)/image_loader.o: loader/image_loader.cc
-	$(CC) -o $@ -c $^ $(CFLAGS)
-
-$(OBJ)/buffer.o: loader/buffer.cc
-	$(CC) -o $@ -c $^ $(CFLAGS)
-
-$(OBJ)/camera.o: camera.cc
-	$(CC) -o $@ -c $^ $(CFLAGS)
-
-$(OBJ)/movement.o: movement.cc
-	$(CC) -o $@ -c $^ $(CFLAGS)
-
-$(OBJ)/window.o: window.cc
-	$(CC) -o $@ -c $^ $(CFLAGS)
-
-$(OBJ)/engine.o: engine.cc
-	$(CC) -o $@ -c $^ $(CFLAGS)
+$(OBJ)/%.o: %.cc
+	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
-	@rm engine
-	@rm -r $(OBJ)
+	@if [ -d $(OBJ) ]; then \
+	    rm -r $(OBJ); \
+	 fi
+	@if [ -e engine ]; then \
+	    rm engine; \
+	 fi
+
