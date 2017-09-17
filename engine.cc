@@ -110,10 +110,6 @@ void initGL(base::Window window) {
     std::exit(EXIT_FAILURE);
   }
 
-  glfwSetKeyCallback(window.getWindow(), key_callback);
- 
-  glViewport(0, 0, window.getWidth(), window.getHeight());
-
   // ---------------- SETUP PROGRAMS -----------------
   programs.push_back(
       graphicsutils::ProgramLoader(
@@ -126,7 +122,6 @@ void initGL(base::Window window) {
 
   // ---------------- INITIALIZE BUFFERS --------------
 
-  glGenBuffers(1, EBO);
   glGenBuffers(1, VBO);  
   glGenVertexArrays(1, VAO);
 
@@ -177,6 +172,7 @@ void initGL(base::Window window) {
 
   // -------------------- SETUP TEXTURES -----------------------
   glGenTextures(1, &texture1);
+  glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, texture1);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -195,13 +191,14 @@ void initGL(base::Window window) {
       0, GL_RGB, GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
 
+
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, texture1);
   programs[0].use();
-  programs[0].setInt("texture1", 0);
+  programs[0].setInt("texture1", 2);
 
 
   // --------------- Transformation matrices -----------------
-  
-
   
   glm::mat4 proj = glm::perspective(
       glm::radians(45.0f),
@@ -211,7 +208,6 @@ void initGL(base::Window window) {
   
   programs[0].setMatrix("projection", proj);
   programs[0].setMatrix("view", camera.getView());
-
 
   // ---------------- GENERATE RECTANGLE -----------------
   glBindVertexArray(VAO[0]);
@@ -237,6 +233,7 @@ int main(int argc, char** argv) {
   glfwSetKeyCallback(window.getWindow(), key_callback);
   glfwSetCursorPosCallback(window.getWindow(), cursor_pos_callback);
   glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetKeyCallback(window.getWindow(), key_callback);
   glfwWindowHint(GLFW_SAMPLES, 8);
 
   initGL(window);
@@ -251,7 +248,6 @@ int main(int argc, char** argv) {
     glEnable(GL_DEPTH_TEST);
     
     programs[0].use();
-    glActiveTexture(GL_TEXTURE0);
 
     programs[0].setMatrix("view", camera.getView());
     glBindVertexArray(VAO[0]);

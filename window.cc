@@ -51,6 +51,7 @@ namespace base {
     
     glfwMakeContextCurrent(_window);
     glfwGetFramebufferSize(_window, &_width, &_height);
+    glViewport(0, 0, _width, _height);
   }
 
   bool Window::getFocus() {
