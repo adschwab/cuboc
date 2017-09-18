@@ -1,17 +1,26 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include <GL/glew.h>
 #include <vector>
+
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+
 #include "loader/programloader.h"
+#include "loader/texture_loader.h"
 
 struct Attribute {
-  int size;
+  int num;
 };
 
 class Object {
   public:
   Object(graphicsutils::ProgramLoader *program);
+  ~Object();
+
+  void init();
+
+  virtual void draw(glm::vec3 pos);
 
   protected:
   GLuint VAO;
@@ -19,18 +28,15 @@ class Object {
 
   GLfloat* _data;
   int _size;
-  std::vector<Attribute> _attrs;
-
+  int _stride;
   graphicsutils::ProgramLoader *_program;
-
+  std::vector<Attribute> _attr_info;
 };
 
 class Box: public Object {
 
   public:
   Box(graphicsutils::ProgramLoader *program);
-
-
 };
 
 

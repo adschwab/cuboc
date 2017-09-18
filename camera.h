@@ -4,10 +4,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#define DEFAULT_SENSITIVITY 5
+
 class Camera {
   
   public:
-  Camera(glm::vec3 pos, float xy_angle, float yz_angle);
+  Camera(glm::vec3 pos,
+      float xy_angle,
+      float yz_angle,
+      float sensitivity=DEFAULT_SENSITIVITY);
   
   glm::mat4 getView();
   glm::vec3 getPosition();
@@ -20,8 +25,7 @@ class Camera {
   
   void updateAngles(
       float xdiff,
-      float ydiff,
-      float sensitivity);
+      float ydiff);
 
   void update_view();
 
@@ -34,7 +38,7 @@ class Camera {
   glm::vec3 _pos;
   float _xy;
   float _yz;
-
+  float _sensitivity;
 };
 
 #endif

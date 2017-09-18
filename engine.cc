@@ -13,19 +13,15 @@
 #include "camera.h"
 #include "movement.h"
 #include "loader/programloader.h"
-#include "loader/image_loader.h"
-
+#include "loader/texture_loader.h"
+#include "loader/object.h"
 
 int target_fps = 30;
 GLfloat loop_time = 1/(float)target_fps;
 
 std::vector<graphicsutils::ProgramLoader> programs;
-
-GLuint VAO[1];
-GLuint VBO[1];
-GLuint EBO[1];
-
-unsigned int texture1;
+TextureLoader *container = NULL;
+Box *box = NULL;
 
 base::Window window = base::Window(1000, 600, "Window Fun");
 
@@ -33,7 +29,6 @@ base::Window window = base::Window(1000, 600, "Window Fun");
 double mouseX = window.getWidth()/2;
 double mouseY = window.getHeight()/2;
 bool mouse_set = false;
-float sensitivity = 5;
 
 glm::vec3 cam_pos = glm::vec3(0.0f, 2.0f, 0.0f);
 Camera camera = Camera(cam_pos, 0.0f, 0.0f);
@@ -99,7 +94,7 @@ static void cursor_pos_callback(GLFWwindow* _window,
     return;
   }
   
-  camera.updateAngles(xdiff, ydiff, sensitivity);
+  camera.updateAngles(xdiff, ydiff);
 }
 
 void initGL(base::Window window) {
@@ -120,83 +115,9 @@ void initGL(base::Window window) {
           "shaders/vertex_color.glsl",
           "shaders/fragment_color.glsl"));
 
-  // ---------------- INITIALIZE BUFFERS --------------
-
-  glGenBuffers(1, VBO);  
-  glGenVertexArrays(1, VAO);
-
-  float vertices[] = {
-      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-       0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-       0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-       0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-      -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-      -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-       0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-       0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-       0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-       0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-       0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-       0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-       0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-      -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-  };
-
-
   // -------------------- SETUP TEXTURES -----------------------
-  glGenTextures(1, &texture1);
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, texture1);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  
-  Loader::Image container = 
-      Loader::Image("textures/container.jpg", 3);
-   
-  void *data = (void *)container.getBuffer();
-  glTexImage2D(GL_TEXTURE_2D, 0, 
-      GL_RGB, 
-      container.getWidth(), 
-      container.getHeight(), 
-      0, GL_RGB, GL_UNSIGNED_BYTE, data);
-  glGenerateMipmap(GL_TEXTURE_2D);
-
-
-  glActiveTexture(GL_TEXTURE2);
-  glBindTexture(GL_TEXTURE_2D, texture1);
-  programs[0].use();
-  programs[0].setInt("texture1", 2);
-
+  container = new TextureLoader("textures/container.jpg");
+  container->init(&programs[0]);
 
   // --------------- Transformation matrices -----------------
   
@@ -210,21 +131,7 @@ void initGL(base::Window window) {
   programs[0].setMatrix("view", camera.getView());
 
   // ---------------- GENERATE RECTANGLE -----------------
-  glBindVertexArray(VAO[0]);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 
-      5 * sizeof(float),
-      (GLvoid*)0);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-      5 * sizeof(float),
-      (GLvoid*)(3 * sizeof(float)));
-  
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-  glBindVertexArray(0);
-
+  box = new Box(&programs[0]);
 }
 
 int main(int argc, char** argv) {
@@ -250,17 +157,10 @@ int main(int argc, char** argv) {
     programs[0].use();
 
     programs[0].setMatrix("view", camera.getView());
-    glBindVertexArray(VAO[0]);
     for (int i = 0; i < num_positions; i ++) {
-      glm::mat4 model;
-      glm::vec3 position = positions[i];
-      position[1] = -position[1]; 
-      model = glm::translate(model, -position);
-      programs[0].setMatrix("model", model);  
-      glDrawArrays(GL_TRIANGLES, 0, 36);
+      box->draw(positions[i]);
     } 
 
-    glBindVertexArray(0);
     glUseProgram(0);
     
     GLfloat time = glfwGetTime();
@@ -275,11 +175,7 @@ int main(int argc, char** argv) {
     glfwSwapBuffers(window.getWindow());
     glfwPollEvents();
   }
-
   
-  glDeleteVertexArrays(1, VAO);
-  glDeleteBuffers(1, VBO);
-  glDeleteBuffers(1, EBO);
   glfwTerminate();
   
   std::printf("Terminating\n");

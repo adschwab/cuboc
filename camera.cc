@@ -9,10 +9,12 @@
 
 
 Camera::Camera(glm::vec3 pos, 
-    float xy_angle, float yz_angle):
+    float xy_angle, float yz_angle,
+    float sensitivity):
       _pos(pos), _xy(xy_angle),
       _yz(yz_angle), 
-      _root_forward(glm::vec3(0.0f, 0.0f, 1.0f)) {
+      _root_forward(glm::vec3(0.0f, 0.0f, 1.0f)),
+      _sensitivity(sensitivity) {
   update_view();
 }
 
@@ -39,11 +41,10 @@ void Camera::setPosition(glm::vec3 new_pos) {
 
 void Camera::updateAngles(
     float xdiff,
-    float ydiff, 
-    float sensitivity) {
-  _xy = _xy - xdiff * PI/(180.0f * sensitivity);
+    float ydiff) {
+  _xy = _xy - xdiff * PI/(180.0f * _sensitivity);
   _yz = glm::max(glm::min(
-      _yz - ydiff * PI/(180.0f * sensitivity),
+      _yz - ydiff * PI/(180.0f * _sensitivity),
       PI/2.0f),-PI/2.0f);
   update_view();
 }
