@@ -50,7 +50,10 @@ void Object::init() {
   glBindVertexArray(0);
 }
 
+void Object::set() {}
+
 void Object::draw(glm::vec3 pos) {
+  set();
   glBindVertexArray(VAO);
   glm::mat4 model;
   pos[1] = -pos[1];
@@ -62,8 +65,11 @@ void Object::draw(glm::vec3 pos) {
 
 
 Box::Box(
-    graphicsutils::ProgramLoader *program) :
-      Object(program) {
+    graphicsutils::ProgramLoader *program,
+    TextureFactory *textures) :
+      Object(program),
+      _textures(textures),
+      texture_key("container"){
   _data = entity::box_data;
   _size = 36;
   _stride = 5;
@@ -76,4 +82,9 @@ Box::Box(
   _attr_info.push_back(texture);
   
   init();
+}
+
+void Box::set() {
+  TextureLoader *texture = _textures->get(texture_key);
+  texture->set(_program);
 }

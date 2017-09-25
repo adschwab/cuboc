@@ -1,14 +1,23 @@
 #include "loader/texture_loader.h"
 
 #include <string>
+#include <unordered_map>
+#include <vector>
+#include <sstream>
 
 #include <GL/glew.h>
 
+#include "platform/io_funcs.h"
 #include "loader/image_loader.h"
 #include "loader/programloader.h"
 
 TextureLoader::TextureLoader(std::string filename) {
 
+  if (glewInit() != GLEW_OK) {
+    std::fprintf(stderr,
+        "Fatal error initializing GLEW. Aborting.\n");
+    std::exit(EXIT_FAILURE);
+  }
   glGenTextures(1, &texId);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texId);
@@ -34,7 +43,7 @@ TextureLoader::TextureLoader(std::string filename) {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void TextureLoader::init(
+void TextureLoader::set(
     graphicsutils::ProgramLoader *program) {
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, texId);
@@ -42,3 +51,40 @@ void TextureLoader::init(
   program->setInt("texture1", 1);
 }
 
+
+//================== FACTORY =================
+
+TextureFactory::TextureFactory(std::string foldername) {
+  std::shared_ptr<std::vector<std::string> > filelist = 
+    io_funcs::get_files(foldername);
+  for (int i = 0; i < filelist->size(); i ++) {
+    std::string name = (*filelist)[i];
+    std::string filename = io_funcs::filename(name);
+    char ext_index = -1;
+    for (int i = filename.size() - 1; i >= 0; i--) {
+      if (filename[i] == '.') {
+        ext_index = i;
+        break;
+      }
+    }
+
+    if (ext_index != -1) {
+      std::string key = filename.substr(0, ext_index);
+      std::string ext = filename.substr(ext_index + 1,
+          filename.size() - ext_index);
+      std::printf("LOADING %s\n", key.c_str());
+      
+      TextureLoader texture(name);
+      _textures.insert(std::make_pair(key, texture));
+    }
+  }
+}
+
+TextureLoader *TextureFactory::get(std::string key) {
+  auto value = _textures.find(key);
+  if (value != _textures.end()) {
+    return &value->second;
+  }
+  std::printf("Error loading texture '%s'\n", key.c_str());
+  std::exit(1);
+}

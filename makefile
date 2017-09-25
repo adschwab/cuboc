@@ -1,7 +1,7 @@
 CC=g++
 GLFW=-lglfw
 GL=-lGLEW -framework OpenGL
-CFLAGS=-I.
+CFLAGS=-std=c++11 -I. -D_UNIX
 OBJ=obj
 
 CXX_SRCS=$(shell find . ! -name "test_*.cc" -name "*.cc")

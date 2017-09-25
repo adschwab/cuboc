@@ -16,6 +16,7 @@ class Window {
   GLFWwindow* getWindow();
   bool getFocus();
   void setFocus(bool focus);
+  bool run();
 
   private:
   GLFWwindow* _window;

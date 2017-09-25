@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
-#include <cmath>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -20,31 +19,24 @@ int target_fps = 30;
 GLfloat loop_time = 1/(float)target_fps;
 
 std::vector<graphicsutils::ProgramLoader> programs;
-TextureLoader *container = NULL;
 Box *box = NULL;
 
 base::Window window = base::Window(1000, 600, "Window Fun");
-
+TextureFactory tex_factory("textures");
 
 double mouseX = window.getWidth()/2;
 double mouseY = window.getHeight()/2;
 bool mouse_set = false;
 
-glm::vec3 cam_pos = glm::vec3(0.0f, 2.0f, 0.0f);
+glm::vec3 cam_pos = glm::vec3(0.0f, 1.0f, -3.0f);
 Camera camera = Camera(cam_pos, 0.0f, 0.0f);
 Movement movement = Movement(&camera);
 
 glm::vec3 positions[] = {
-    glm::vec3(0.0f, 0.0f, 3.0f),
-    glm::vec3(0.0f, 0.0f, 4.0f),
-    glm::vec3(0.0f, 0.0f, 5.0f),
-    glm::vec3(0.0f, 1.0f, 3.0f),
-    glm::vec3(1.0f, 0.0f, 3.0f),
-    glm::vec3(1.0f, 0.0f, 4.0f),
-    glm::vec3(1.0f, 0.0f, 5.0f)
+    glm::vec3(0.0f, 0.0f, 0.0f)
 };
 
-int num_positions = 7;
+int num_positions = sizeof(positions) / (sizeof(float) * 3);;
 
 static void err_callback(
     int error,
@@ -97,7 +89,7 @@ static void cursor_pos_callback(GLFWwindow* _window,
   camera.updateAngles(xdiff, ydiff);
 }
 
-void initGL(base::Window window) {
+void initGL() {
 
   glewExperimental = true;
   if (glewInit() != GLEW_OK) {
@@ -115,10 +107,6 @@ void initGL(base::Window window) {
           "shaders/vertex_color.glsl",
           "shaders/fragment_color.glsl"));
 
-  // -------------------- SETUP TEXTURES -----------------------
-  container = new TextureLoader("textures/container.jpg");
-  container->init(&programs[0]);
-
   // --------------- Transformation matrices -----------------
   
   glm::mat4 proj = glm::perspective(
@@ -126,12 +114,12 @@ void initGL(base::Window window) {
       (float)window.getWidth()/(float)window.getHeight(),
       0.1f,
       100.0f);
-  
+
+  programs[0].use(); 
   programs[0].setMatrix("projection", proj);
-  programs[0].setMatrix("view", camera.getView());
 
   // ---------------- GENERATE RECTANGLE -----------------
-  box = new Box(&programs[0]);
+  box = new Box(&programs[0], &tex_factory);
 }
 
 int main(int argc, char** argv) {
@@ -141,21 +129,20 @@ int main(int argc, char** argv) {
   glfwSetCursorPosCallback(window.getWindow(), cursor_pos_callback);
   glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetKeyCallback(window.getWindow(), key_callback);
-  glfwWindowHint(GLFW_SAMPLES, 8);
 
-  initGL(window);
+  initGL();
   GLfloat lap_time = glfwGetTime();
   glEnable(GL_MULTISAMPLE);
 
   std::printf("Running\n");
-  while (!glfwWindowShouldClose(window.getWindow())) {
+  while (window.run()) {
     movement.updatePosition();
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     
     programs[0].use();
-
+    programs[0].setFloat("scale", 2.0f);
     programs[0].setMatrix("view", camera.getView());
     for (int i = 0; i < num_positions; i ++) {
       box->draw(positions[i]);

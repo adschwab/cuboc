@@ -20,6 +20,7 @@ class Object {
 
   void init();
 
+  virtual void set();
   virtual void draw(glm::vec3 pos);
 
   protected:
@@ -36,7 +37,14 @@ class Object {
 class Box: public Object {
 
   public:
-  Box(graphicsutils::ProgramLoader *program);
+  Box(graphicsutils::ProgramLoader *program,
+      TextureFactory *textures);
+
+  virtual void set();
+
+  private:
+  TextureFactory *_textures;
+  std::string texture_key;
 };
 
 

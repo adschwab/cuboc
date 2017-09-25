@@ -8,9 +8,17 @@ out vec2 texCoords;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform float scale;
 
 void main() {
   texCoords = vTexCoords;
-  gl_Position = projection * view * model * vec4(position, 1.0);
+  mat4 scale_m = mat4(scale);
+  scale_m[3][3] = 1.0;
+
+  scale_m[3][0] = -0.5 * scale;
+  scale_m[3][1] = 0.5 * scale;
+  scale_m[3][2] = -0.5 * scale;
+
+  gl_Position = projection * view * model * scale_m * vec4(position, 1.0);
 }
 
