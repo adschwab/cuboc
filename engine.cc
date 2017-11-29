@@ -13,7 +13,9 @@
 #include "movement.h"
 #include "loader/programloader.h"
 #include "loader/texture_loader.h"
-#include "loader/object.h"
+#include "objects/box.h"
+#include "objects/ground.h"
+#include "gen/ground_gen.h"
 
 int target_fps = 30;
 GLfloat loop_time = 1/(float)target_fps;
@@ -133,9 +135,11 @@ void initGL() {
   heights.assign(ground_data, ground_data + 20);
   std::vector<int> tex_ids;
 
-
+  
   ground = new Ground(&programs[0], &tex_factory,
-      4,5,heights,tex_ids);
+      100,200,
+      gen_ground_data(100,200),
+      tex_ids);
 
 
 }

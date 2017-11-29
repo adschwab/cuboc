@@ -21,6 +21,8 @@ pre:
 	@mkdir -p $(OBJ)
 	@mkdir -p $(OBJ)/loader
 	@mkdir -p $(OBJ)/util
+	@mkdir -p $(OBJ)/objects
+	@mkdir -p $(OBJ)/gen
 
 engine: $(CXX_OBJS)
 	$(CC) -o $@ $^ $(GLFW) $(GL)
