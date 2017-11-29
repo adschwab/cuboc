@@ -26,4 +26,12 @@ void walkLine(
  */
 glm::vec3 calcDir(float xy, float yz);
 
+bool findBounds(int x1, int x2,
+    int y1, int y2,
+    int z1, int z2,
+    int cx, int cy, int cz, int size,
+    int &bx1, int &bx2,
+    int &by1, int &by2,
+    int &bz1, int &bz2);
+
 #endif

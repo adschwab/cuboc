@@ -20,6 +20,7 @@ GLfloat loop_time = 1/(float)target_fps;
 
 std::vector<graphicsutils::ProgramLoader> programs;
 Box *box = NULL;
+Ground *ground = NULL;
 
 base::Window window = base::Window(1000, 600, "Window Fun");
 TextureFactory tex_factory("textures");
@@ -28,12 +29,12 @@ double mouseX = window.getWidth()/2;
 double mouseY = window.getHeight()/2;
 bool mouse_set = false;
 
-glm::vec3 cam_pos = glm::vec3(0.0f, 1.0f, -3.0f);
+glm::vec3 cam_pos = glm::vec3(0.0f, 4.0f, -3.0f);
 Camera camera = Camera(cam_pos, 0.0f, 0.0f);
 Movement movement = Movement(&camera);
 
 glm::vec3 positions[] = {
-    glm::vec3(0.0f, 0.0f, 0.0f)
+    glm::vec3(0.0f, 0.0f, 0.0f),
 };
 
 int num_positions = sizeof(positions) / (sizeof(float) * 3);;
@@ -120,6 +121,23 @@ void initGL() {
 
   // ---------------- GENERATE RECTANGLE -----------------
   box = new Box(&programs[0], &tex_factory);
+
+  GLfloat ground_data[] = {
+    0.0f,0.0f,0.0f,0.0f,
+    0.0f,0.0f,0.0f,0.5f,
+    0.0f,0.5f,0.0f,0.0f,
+    0.0f,0.7f,0.0f,0.0f,
+    0.0f,0.0f,0.0f,0.0f
+  };
+  std::vector<GLfloat> heights;
+  heights.assign(ground_data, ground_data + 20);
+  std::vector<int> tex_ids;
+
+
+  ground = new Ground(&programs[0], &tex_factory,
+      4,5,heights,tex_ids);
+
+
 }
 
 int main(int argc, char** argv) {
@@ -142,10 +160,10 @@ int main(int argc, char** argv) {
     glEnable(GL_DEPTH_TEST);
     
     programs[0].use();
-    programs[0].setFloat("scale", 2.0f);
+    programs[0].setFloat("scale", 1.0f);
     programs[0].setMatrix("view", camera.getView());
     for (int i = 0; i < num_positions; i ++) {
-      box->draw(positions[i]);
+      ground->draw(positions[i]);
     } 
 
     glUseProgram(0);

@@ -6,10 +6,16 @@ OBJ=obj
 
 CXX_SRCS=$(shell find . ! -name "test_*.cc" -name "*.cc")
 CXX_OBJS=$(addprefix $(OBJ)/, ${CXX_SRCS:.cc=.o})
+TEST_SRCS=$(shell find . -name "test_*.cc")
+TEST_OBJS=$(addprefix $(OBJ)/, ${TEST_SRCS:.cc=.o})
+TEST_BINS=$(addprefix $(OBJ)/, ${TEST_SRCS:.cc=.bin})
+LIB_OBJS := $(filter-out $(OBJ)/./engine.o, $(CXX_OBJS))
 
 .PHONY: clean pre make
 
 make: pre engine
+
+test: pre $(TEST_BINS)
 
 pre:
 	@mkdir -p $(OBJ)
@@ -18,6 +24,9 @@ pre:
 
 engine: $(CXX_OBJS)
 	$(CC) -o $@ $^ $(GLFW) $(GL)
+
+$(OBJ)/%.bin: $(OBJ)/%.o | $(LIB_OBJS)
+	$(CC) -o $@ $^ $(LIB_OBJS) $(GLFW) $(GL)
 
 $(OBJ)/%.o: %.cc
 	$(CC) -o $@ -c $< $(CFLAGS)

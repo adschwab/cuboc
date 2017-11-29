@@ -14,5 +14,11 @@ Install glew from website
 ------------------------------------
 Compile:
 
-MAC:
-g++ engine.cc loadfile.cc -lglfw -lGLEW -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
+UNIX:
+`make`
+
+------------------------------------
+Run:
+
+UNIX:
+`./engine`

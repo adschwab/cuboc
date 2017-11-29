@@ -22,8 +22,8 @@ void Movement::updatePosition() {
     backward = 0.0f;
   }
   
-  if (left + right + forward + backward < 3 &&
-      left + right + forward + backward > 1) {
+  if (left + right + forward + backward < 2.5 &&
+      left + right + forward + backward > 1.5) {
     left *= 1.0f/glm::sqrt(2);
     right *= 1.0f/glm::sqrt(2);
     forward *= 1.0f/glm::sqrt(2);
@@ -31,19 +31,19 @@ void Movement::updatePosition() {
   }
   
   glm::vec3 pos = cam->getPosition();
-  if (left > 0.0f) {
+  if (left > 0.01f) {
     pos[2] -= speed * diff * left * glm::sin(cam->getXY());
     pos[0] += speed * diff * left * glm::cos(cam->getXY());
   }
-  if (right > 0.0f) {
+  if (right > 0.01f) {
     pos[2] += speed * diff * right * glm::sin(cam->getXY());
     pos[0] -= speed * diff * right * glm::cos(cam->getXY());
   }
-  if (forward > 0.0f) {
+  if (forward > 0.01f) {
     pos[2] += speed * diff * forward * glm::cos(cam->getXY());
     pos[0] += speed * diff * forward * glm::sin(cam->getXY());
   }
-  if (backward > 0.0f) {
+  if (backward > 0.01f) {
     pos[2] -= speed * diff * backward * glm::cos(cam->getXY());
     pos[0] -= speed * diff * backward * glm::sin(cam->getXY());
   }

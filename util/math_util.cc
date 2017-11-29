@@ -1,3 +1,5 @@
+#include "util/math_util.h"
+
 #include <cstdio>
 #include <cmath>
 
@@ -95,4 +97,41 @@ glm::vec3 calcDir(float xy, float yz) {
 
   return glm::vec3(x, y, z);
 }
+
+inline bool findBounds(int p1, int p2,
+    int c, int size,
+    int &b1, int &b2) {
+  if (p1 > p2)
+    return false;
+
+  if (c >= p1 && c + size < p1)
+    b1 = c;
+  else if (c + size >= p1)
+    return false;
+  else
+    b1 = p1;
+
+  if (p2 >= c + size - 1)
+    b2 = c + size - 1;
+  else
+    b2 = p2;
+  return true; 
+}
+
+bool findBounds(int x1, int x2,
+    int y1, int y2,
+    int z1, int z2,
+    int cx, int cy, int cz, 
+    int size,
+    int &bx1, int &bx2,
+    int &by1, int &by2, 
+    int &bz1, int &bz2) {
+  std::printf("(%d, %d, %d), (%d, %d, %d)", x1, y1, z1, x2, y2, z2);
+  if (!findBounds(x1, x2, cx, size, bx1, bx2))
+    return false;
+  if (!findBounds(y1, y2, cy, size, by1, by2))
+    return false;
+  return findBounds(z1, z2, cz, size, bz1, bz2);
+}
+
 
