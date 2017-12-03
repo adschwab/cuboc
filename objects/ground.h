@@ -17,8 +17,8 @@ class Ground: public Object {
   Ground(graphicsutils::ProgramLoader *program,
       TextureFactory *textures,
       int width, int depth,
-      std::shared_ptr<std::vector<GLfloat>> heights,
-      std::vector<int> tex_ids);
+      std::shared_ptr<const std::vector<GLfloat> > heights,
+      int tex_id);
 
   virtual void set();
 
@@ -38,9 +38,8 @@ class Ground: public Object {
   
   int _width;
   int _depth;
-  std::shared_ptr<std::vector<GLfloat>> _heights;
-  std::vector<int> _tex_ids;
-  std::string texture_key;
+  std::shared_ptr<const std::vector<GLfloat>> _heights;
+  int _tex_id;
   std::vector<GLfloat> temp_floats;
 };
 

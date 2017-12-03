@@ -5,78 +5,49 @@
 #include <vector>
 #include <memory>
 
-#include "loader/object.h"
-#include "section.h"
+#include "loader/programloader.h"
+#include "loader/texture_loader.h"
 
+#include "objects/ground.h"
+#include "util/hashkey.h"
 
-class ObjectSection : public Section {
-  
+#define BLOCK_SIZE 8
+
+class Block {
   public:
-  ObjectSection(int size, Index index, Object *object) :
-      Section(size, index),
-      _obj(object) {}
+  Block(std::shared_ptr<std::vector<float> > heights):
+    _heights(heights) {}
 
-  Object *get(int x, int y, int z) {
-    return _obj;
+  ~Block() {}
+
+  std::shared_ptr<const std::vector<float> > get() {
+    return _heights;
   }
-  
-  void set(
-      int x1, int x2,
-      int y1, int y2,
-      int z1, int z2,
-      Object &obj);
 
-  virtual void draw();
-
-  virtual bool drawable() { return true; };
   private:
-  Object *_obj;
-};
+  std::shared_ptr<std::vector<float> > _heights;
 
-class SubSection : public Section {
-
-  public:
-  SubSection(int size, Index index);
-
-  SubSection(int size, Index index, Object *obj);
-
-  virtual void set(
-      int x1, int x2,
-      int y1, int y2,
-      int z1, int z2,
-      Object &obj);
-
-  virtual Object *get(int x, int y, int z);
-
-  virtual void draw();
-
-  virtual bool drawable() { return false; }
-  
-  private:
-  std::unique_ptr<Section> subsections[8];
 };
 
 class World {
-  
+
   public:
-  World() {}
-  
-  ~World() {
-    sections.clear();
-  }
-  
-  void set(
-      int x1, int x2,
-      int y1, int y2,
-      int z1, int z2,
-      Object &obj);
+  World(graphicsutils::ProgramLoader *program,
+      TextureFactory *textures);
 
-  Object *get(int x, int y, int z);
+  void init();
 
-  void draw(int x, int y, int z, float radius);
+  void draw();
 
   private:
-  std::unordered_map<Index, std::shared_ptr<Section> > sections;
+  graphicsutils::ProgramLoader *_program;
+  TextureFactory *_textures;
+
+  std::unordered_map<XYCoord, Block> _blocks;
+
 };
+
+
+
 
 #endif

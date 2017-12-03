@@ -15,15 +15,14 @@
 Ground::Ground(graphicsutils::ProgramLoader *program,
     TextureFactory *textures,
     int width, int depth,
-    std::shared_ptr<std::vector<GLfloat>> heights,
-    std::vector<int> tex_ids) :
+    std::shared_ptr<const std::vector<GLfloat>> heights,
+    int tex_id) :
       Object(program),
       _textures(textures),
       _width(width),
       _depth(depth),
       _heights(heights),
-      _tex_ids(tex_ids),
-      texture_key("dirt") {
+      _tex_id(tex_id) {
   _size = 0;
   _stride = 3;
   
@@ -36,8 +35,7 @@ Ground::Ground(graphicsutils::ProgramLoader *program,
       GLfloat cx = (GLfloat)(i + 0.5f);
       GLfloat cy = (GLfloat)(j + 0.5f);
       GLfloat cz = (x1y1 + x2y1 + x1y2 + x2y2)/4.0f;
-      //std::printf("%.2f,%.2f,%.2f\n", x1y1, x2y1, x1y2);
-      //std::printf("%.2f,%.2f,%.2f\n", x2y1, x1y2, x2y2);
+      //std::printf("%.2f,%.2f,%.2f,%.2f\n", x1y1, x2y1, x1y2, x2y2);
     
       push_vertex((GLfloat)i, x1y1, (GLfloat)j, 0.0f, 0.0f);
       push_vertex((GLfloat)(i + 1), x1y2, (GLfloat)j, 1.0f, 0.0f);
@@ -70,7 +68,7 @@ Ground::Ground(graphicsutils::ProgramLoader *program,
 }
 
 void Ground::set() {
-  TextureLoader *texture = _textures->get(texture_key);
+  TextureLoader *texture = _textures->get(_tex_id);
   texture->set(_program);
 }
 

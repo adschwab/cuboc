@@ -57,34 +57,55 @@ void TextureLoader::set(
 TextureFactory::TextureFactory(std::string foldername) {
   std::shared_ptr<std::vector<std::string> > filelist = 
     io_funcs::get_files(foldername);
+
   for (int i = 0; i < filelist->size(); i ++) {
     std::string name = (*filelist)[i];
     std::string filename = io_funcs::filename(name);
-    char ext_index = -1;
+    int ext_index = -1;
+    int und_index = -1;
     for (int i = filename.size() - 1; i >= 0; i--) {
-      if (filename[i] == '.') {
-        ext_index = i;
+      if (filename[i] == '_') {
+        und_index = i;
         break;
       }
+      else if (filename[i] == '.') {
+        ext_index = i;
+      }
     }
-
-    if (ext_index != -1) {
-      std::string key = filename.substr(0, ext_index);
-      std::string ext = filename.substr(ext_index + 1,
-          filename.size() - ext_index);
-      std::printf("LOADING %s\n", key.c_str());
+    if (und_index == -1 || ext_index == -1)
+      continue;
+    std::string key = filename.substr(0, und_index);
+    std::string idstr = filename.substr(
+        und_index + 1,
+        ext_index - und_index - 1);
+    int id = std::stoi(idstr);
+    std::string ext = filename.substr(ext_index + 1,
+        filename.size() - ext_index);
+    std::printf("LOADING %s\n", key.c_str());
       
-      TextureLoader texture(name);
-      _textures.insert(std::make_pair(key, texture));
-    }
+    TextureLoader texture(name);
+    _textures.insert(std::make_pair(id, texture));
+    _idmap.insert(std::make_pair(key, id));
   }
 }
 
-TextureLoader *TextureFactory::get(std::string key) {
-  auto value = _textures.find(key);
-  if (value != _textures.end()) {
-    return &value->second;
+TextureLoader *TextureFactory::get(int id) {
+  auto value = _textures.find(id);
+  if (value == _textures.end()) {
+    std::printf(
+        "Error in texture configuration - '%d'\n",
+        id);
+    std::exit(1);
   }
-  std::printf("Error loading texture '%s'\n", key.c_str());
-  std::exit(1);
+  return &value->second;
+}
+
+
+TextureLoader *TextureFactory::get(std::string key) {
+  auto idpair = _idmap.find(key);
+  if (idpair == _idmap.end()) {
+    std::printf("Texture not found: '%s'\n", key.c_str());
+    std::exit(1);
+  }
+  return get(idpair->second);
 }

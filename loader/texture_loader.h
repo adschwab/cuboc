@@ -29,10 +29,14 @@ class TextureFactory {
   }
 
   TextureLoader *get(std::string key);
+  
+  TextureLoader *get(int id);
 
   private:
   std::unordered_map
-      <std::string, TextureLoader> _textures;
+      <int, TextureLoader> _textures;
+  std::unordered_map
+      <std::string, int> _idmap;
 };
 
 #endif

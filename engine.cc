@@ -13,6 +13,7 @@
 #include "movement.h"
 #include "loader/programloader.h"
 #include "loader/texture_loader.h"
+#include "world.h"
 #include "objects/box.h"
 #include "objects/ground.h"
 #include "gen/ground_gen.h"
@@ -23,6 +24,7 @@ GLfloat loop_time = 1/(float)target_fps;
 std::vector<graphicsutils::ProgramLoader> programs;
 Box *box = NULL;
 Ground *ground = NULL;
+World *world = NULL;
 
 base::Window window = base::Window(1000, 600, "Window Fun");
 TextureFactory tex_factory("textures");
@@ -124,24 +126,14 @@ void initGL() {
   // ---------------- GENERATE RECTANGLE -----------------
   box = new Box(&programs[0], &tex_factory);
 
-  GLfloat ground_data[] = {
-    0.0f,0.0f,0.0f,0.0f,
-    0.0f,0.0f,0.0f,0.5f,
-    0.0f,0.5f,0.0f,0.0f,
-    0.0f,0.7f,0.0f,0.0f,
-    0.0f,0.0f,0.0f,0.0f
-  };
-  std::vector<GLfloat> heights;
-  heights.assign(ground_data, ground_data + 20);
-  std::vector<int> tex_ids;
 
   
   ground = new Ground(&programs[0], &tex_factory,
-      100,200,
-      gen_ground_data(100,200),
-      tex_ids);
+      2, 2,
+      gen_ground_data(2, 2),
+      1);
 
-
+  world = new World(&programs[0], &tex_factory);
 }
 
 int main(int argc, char** argv) {
@@ -167,7 +159,8 @@ int main(int argc, char** argv) {
     programs[0].setFloat("scale", 1.0f);
     programs[0].setMatrix("view", camera.getView());
     for (int i = 0; i < num_positions; i ++) {
-      ground->draw(positions[i]);
+      //ground->draw(positions[i]);
+      world->draw();
     } 
 
     glUseProgram(0);
