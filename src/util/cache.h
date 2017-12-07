@@ -25,6 +25,7 @@ class Cache {
   }
 
   void add(I index, std::shared_ptr<D> data) {
+    _addrs[hash_fn(index) % _size] = index;
     _cache[hash_fn(index) % _size] = data;
   }
 

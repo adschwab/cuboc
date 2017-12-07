@@ -60,7 +60,7 @@ void World::draw() {
 
     std::shared_ptr<GroundObj> ground_obj;
     ground_obj = _cache.get(key);
-    
+
     if (!_cache.contains(key) || !ground_obj) {
       std::shared_ptr<Ground> ground = 
           std::make_shared<Ground>(
