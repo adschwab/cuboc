@@ -8,7 +8,7 @@
 std::shared_ptr<std::vector<GLfloat>> gen_ground_data(
     int xsz,
     int ysz) {
-
+  
   float mean = 0.0f;
   float sd = 0.2f;
 
@@ -27,5 +27,10 @@ std::shared_ptr<std::vector<GLfloat>> gen_ground_data(
       heights->push_back(change);
     }
   }
+  /*heights->push_back(0.0f);
+  heights->push_back(0.2f);
+  heights->push_back(0.4f);
+  heights->push_back(0.6f);
+*/
   return heights;
 }

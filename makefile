@@ -30,7 +30,7 @@ engine: $(CXX_OBJS)
 $(OBJ)/%.bin: $(OBJ)/%.o | $(LIB_OBJS)
 	$(CC) -o $@ $^ $(CPPFLAGS) $(LIB_OBJS) $(GLFW) $(GL)
 
-$(OBJ)/%.o: %.cc
+$(OBJ)/%.o: src/%.cc
 	$(CC) -o $@ -c $< $(CPPFLAGS)
 
 clean:

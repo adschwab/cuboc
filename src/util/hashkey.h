@@ -10,6 +10,8 @@ struct XYCoord {
   float x;
   float y;
 
+  XYCoord() : x(0.0f), y(0.0f) {}
+
   XYCoord(float x_, float y_) : x(x_), y(y_) {}
 
   bool operator==(const XYCoord &other) const{
@@ -26,6 +28,7 @@ struct XYCoord {
   glm::vec3 vec() const {
     return glm::vec3(x, 0.0f, y);
   }
+
 };
 
 inline XYCoord operator+(XYCoord lhs, const XYCoord& rhs)

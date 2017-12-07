@@ -33,7 +33,7 @@ double mouseX = window.getWidth()/2;
 double mouseY = window.getHeight()/2;
 bool mouse_set = false;
 
-glm::vec3 cam_pos = glm::vec3(0.0f, 4.0f, -3.0f);
+glm::vec3 cam_pos = glm::vec3(0.0f, 2.0f, 0.0f);
 Camera camera = Camera(cam_pos, 0.0f, 0.0f);
 Movement movement = Movement(&camera);
 
