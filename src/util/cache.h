@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#define DEFAULT_SIZE 10
+#define DEFAULT_SIZE 211
 
 namespace util {
 

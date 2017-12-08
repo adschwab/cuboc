@@ -45,11 +45,11 @@ void World::draw() {
 
     XYCoord key = it->first;
 
-    XYCoord xneighbor(key.x + (float)BLOCK_SIZE, key.y);
-    XYCoord yneighbor(key.x, key.y + (float)BLOCK_SIZE);
+    XYCoord xneighbor(key.x() + (float)BLOCK_SIZE, key.y());
+    XYCoord yneighbor(key.x(), key.y() + (float)BLOCK_SIZE);
     XYCoord xyneighbor(
-        key.x + (float)BLOCK_SIZE,
-        key.y + (float)BLOCK_SIZE);
+        key.x() + (float)BLOCK_SIZE,
+        key.y() + (float)BLOCK_SIZE);
  
     std::shared_ptr<const std::vector<float> > xheights;
     std::shared_ptr<const std::vector<float> > yheights; 
@@ -79,7 +79,7 @@ void World::draw() {
     if (!ground_obj->x && xiter != _blocks.end()) {
       xheights = xiter->second.get();
       auto newheights = std::make_shared<std::vector<float> >();
-      XYCoord newcoord(key.x + 1, key.y);
+      XYCoord newcoord(key.x() + 1, key.y());
       for (int i = 0; i < BLOCK_SIZE; i ++) {
         newheights->push_back(
             (*xheights)[i * BLOCK_SIZE + BLOCK_SIZE - 1]);
@@ -102,7 +102,7 @@ void World::draw() {
     if (!ground_obj->y && yiter != _blocks.end()) {
       yheights = yiter->second.get();
       auto newheights = std::make_shared<std::vector<float> >();
-      XYCoord newcoord(key.x, key.y + 1);
+      XYCoord newcoord(key.x(), key.y() + 1);
       for (int i = 0; i < BLOCK_SIZE; i ++) {
         newheights->push_back(
             (*yheights)[BLOCK_SIZE * (BLOCK_SIZE - 1) + i]);
@@ -129,7 +129,7 @@ void World::draw() {
         && xyiter != _blocks.end()) {
       auto xyheights = xyiter->second.get();
       auto newheights = std::make_shared<std::vector<float> >();
-      XYCoord newcoord(key.x + 1, key.y + 1);
+      XYCoord newcoord(key.x() + 1, key.y() + 1);
       newheights->push_back(
           (*xyheights)[BLOCK_SIZE * BLOCK_SIZE - 1]);
       newheights->push_back(
