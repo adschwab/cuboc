@@ -5,12 +5,13 @@
 
 #include <GL/glew.h>
 
-std::shared_ptr<std::vector<GLfloat>> gen_ground_data(
-    int xsz,
-    int ysz) {
-  
+void gen_ground_data(
+    std::unordered_map<XYCoord, Block> &blocks,
+    std::shared_ptr<std::vector<GLfloat> > out_heights,
+    std::shared_ptr<std::vector<int> > out_tex_ids) {
   float mean = 0.0f;
   float sd = 0.2f;
+
 
   std::normal_distribution<float> dis(
       mean,
@@ -19,18 +20,14 @@ std::shared_ptr<std::vector<GLfloat>> gen_ground_data(
   std::random_device rd;
   std::mt19937 gen(rd());
   
-  std::shared_ptr<std::vector<GLfloat>> heights = 
-      std::make_shared<std::vector<GLfloat>>();
-  for (int i = 0; i < xsz; i ++) {
-    for (int j = 0; j < ysz; j ++) {
+  for (int i = 0; i < BLOCK_SIZE; i ++) {
+    for (int j = 0; j < BLOCK_SIZE; j ++) {
       float change = dis(gen);
-      heights->push_back(change);
+      out_heights->push_back(change);
     }
   }
-  /*heights->push_back(0.0f);
-  heights->push_back(0.2f);
-  heights->push_back(0.4f);
-  heights->push_back(0.6f);
-*/
-  return heights;
+
+  for (int i = 0; i < 4; ++i) {
+    out_tex_ids->push_back(dis(gen) > 0 ? 0 : 1);
+  }
 }

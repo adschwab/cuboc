@@ -3,10 +3,13 @@
 
 #include <memory>
 
+#include "world.h"
+
 #include "objects/ground.h"
 
-std::shared_ptr<std::vector<GLfloat>> gen_ground_data(
-    int xsz,
-    int ysz);
+void gen_ground_data(
+    std::unordered_map<XYCoord, Block> &blocks,
+    std::shared_ptr<std::vector<GLfloat> > out_heights,
+    std::shared_ptr<std::vector<int> > out_tex_ids);
 
 #endif // inclusion guard

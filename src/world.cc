@@ -1,7 +1,8 @@
 #include "world.h"
 
 #include <vector>
-#include <unordered_map>
+
+#include <glm/glm.hpp>
 
 #include "gen/ground_gen.h"
 #include "objects/ground.h"
@@ -20,9 +21,13 @@ void GroundObj::draw() {
     xy->draw(xypos.vec());
 }
 
-World::World(graphicsutils::ProgramLoader *program,
-    TextureFactory *textures) :
-      _program(program), _textures(textures) {
+World::World(
+    graphicsutils::ProgramLoader *program,
+    TextureFactory *textures,
+    float render_dist) :
+      _program(program),
+      _textures(textures),
+      _render_dist(render_dist) {
   init();
 }
 
@@ -31,16 +36,19 @@ void World::init() {
     for (int j = 0; j < 2; j ++) {
       XYCoord coord((float)BLOCK_SIZE * i,
           (float)BLOCK_SIZE * j);
-      std::shared_ptr<std::vector<float> > heights = 
-          gen_ground_data(BLOCK_SIZE, BLOCK_SIZE);
-      Block block(heights);
+      std::shared_ptr<std::vector<float> > heights =
+          std::make_shared<std::vector<float> >();
+      std::shared_ptr<std::vector<int> > tex_ids =
+          std::make_shared<std::vector<int> >();
+      gen_ground_data(_blocks, heights, tex_ids);
+      Block block(heights, tex_ids);
       _blocks.insert(std::make_pair(coord, block));
     }
   }
 }
 
-void World::draw() {
-  
+void World::draw(glm::vec3 vec) {
+  XYCoord cam(vec);
   for (auto it = _blocks.begin(); it != _blocks.end(); ++it) {
 
     XYCoord key = it->first;
@@ -69,7 +77,7 @@ void World::draw() {
               BLOCK_SIZE,
               BLOCK_SIZE,
               heights,
-              1);
+              block.getMainTex());
       ground_obj = std::make_shared<GroundObj>();
       ground_obj->main = ground;
       ground_obj->main_pos = key;
@@ -92,7 +100,7 @@ void World::draw() {
               2,
               BLOCK_SIZE,
               newheights,
-              1);
+              block.getXTex());
       ground_obj->x = xground;
       ground_obj->xpos = newcoord;
     }
@@ -117,7 +125,7 @@ void World::draw() {
               BLOCK_SIZE,
               2,
               newheights,
-              1);
+              block.getYTex());
       ground_obj->y = yground;
       ground_obj->ypos = newcoord;
     }
@@ -145,7 +153,7 @@ void World::draw() {
               2,
               2,
               newheights,
-              1);
+              block.getXYTex());
       ground_obj->xy = xyground;
       ground_obj->xypos = newcoord;
     }

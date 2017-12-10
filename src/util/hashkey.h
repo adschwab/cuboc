@@ -22,6 +22,11 @@ struct XYCoord {
     this->setY(y_);
   }
 
+  XYCoord(glm::vec3 vec) {
+    this->setX(vec[0]);
+    this->setY(vec[2]);
+  }
+  
   float x() const {
     return coords.vals[0];
   }
@@ -41,6 +46,10 @@ struct XYCoord {
   bool operator==(const XYCoord &other) const{
     return (this->x() == other.x()
         && this->y() == other.y());
+  }
+
+  bool operator!=(const XYCoord &other) const{
+    return !(*this == other);
   }
 
   XYCoord& operator+=(const XYCoord &other) {

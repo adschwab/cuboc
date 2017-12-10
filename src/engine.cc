@@ -15,8 +15,6 @@
 #include "loader/texture_loader.h"
 #include "world.h"
 #include "objects/box.h"
-#include "objects/ground.h"
-#include "gen/ground_gen.h"
 
 int target_fps = 30;
 GLfloat loop_time = 1/(float)target_fps;
@@ -125,14 +123,6 @@ void initGL() {
 
   // ---------------- GENERATE RECTANGLE -----------------
   box = new Box(&programs[0], &tex_factory);
-
-
-  
-  ground = new Ground(&programs[0], &tex_factory,
-      2, 2,
-      gen_ground_data(2, 2),
-      1);
-
   world = new World(&programs[0], &tex_factory);
 }
 
@@ -159,8 +149,7 @@ int main(int argc, char** argv) {
     programs[0].setFloat("scale", 1.0f);
     programs[0].setMatrix("view", camera.getView());
     for (int i = 0; i < num_positions; i ++) {
-      //ground->draw(positions[i]);
-      world->draw();
+      world->draw(cam_pos);
     } 
 
     glUseProgram(0);
