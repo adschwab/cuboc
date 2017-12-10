@@ -10,7 +10,7 @@
 #include "util/loadfile.h"
 
 namespace graphicsutils {
-
+  
 ProgramLoader::ProgramLoader(std::string v_glsl, std::string f_glsl) : v_file(v_glsl), f_file(f_glsl) {
   std::string result = load(progid);
   if (result != "OK") {
@@ -85,6 +85,22 @@ GLint ProgramLoader::load_shader(std::string file_name, GLenum shadertype, GLuin
   }
   
   return success;
+}
+
+Program3d::Program3d(
+    std::string v_glsl,
+    std::string f_glsl,
+    Camera *camera) :
+      ProgramLoader(v_glsl, f_glsl),
+      _camera(camera) {
+  this->use();
+  this->setMatrix("projection", _camera->getProj());
+  glUseProgram(0);
+}
+
+void Program3d::use() {
+  ProgramLoader::use();
+  this->setMatrix("view", _camera->getView());
 }
 
 } //namespace graphicsutils

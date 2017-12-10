@@ -5,7 +5,6 @@
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 
 #include "window.h"
@@ -14,14 +13,12 @@
 #include "loader/programloader.h"
 #include "loader/texture_loader.h"
 #include "world.h"
-#include "objects/box.h"
 
 int target_fps = 30;
 GLfloat loop_time = 1/(float)target_fps;
 
-std::vector<graphicsutils::ProgramLoader> programs;
-Box *box = NULL;
-Ground *ground = NULL;
+std::vector<std::shared_ptr<graphicsutils::ProgramLoader> >
+    programs;
 World *world = NULL;
 
 base::Window window = base::Window(1000, 600, "Window Fun");
@@ -32,14 +29,8 @@ double mouseY = window.getHeight()/2;
 bool mouse_set = false;
 
 glm::vec3 cam_pos = glm::vec3(0.0f, 2.0f, 0.0f);
-Camera camera = Camera(cam_pos, 0.0f, 0.0f);
+Camera camera = Camera(&window, cam_pos, 0.0f, 0.0f);
 Movement movement = Movement(&camera);
-
-glm::vec3 positions[] = {
-    glm::vec3(0.0f, 0.0f, 0.0f),
-};
-
-int num_positions = sizeof(positions) / (sizeof(float) * 3);;
 
 static void err_callback(
     int error,
@@ -102,28 +93,18 @@ void initGL() {
 
   // ---------------- SETUP PROGRAMS -----------------
   programs.push_back(
-      graphicsutils::ProgramLoader(
+      std::make_shared<graphicsutils::Program3d> (
           "shaders/vertex.glsl",
-          "shaders/fragment.glsl"));
+          "shaders/fragment.glsl",
+          &camera));
   programs.push_back(
-      graphicsutils::ProgramLoader(
-          "shaders/vertex_color.glsl",
-          "shaders/fragment_color.glsl"));
-
-  // --------------- Transformation matrices -----------------
-  
-  glm::mat4 proj = glm::perspective(
-      glm::radians(45.0f),
-      (float)window.getWidth()/(float)window.getHeight(),
-      0.1f,
-      100.0f);
-
-  programs[0].use(); 
-  programs[0].setMatrix("projection", proj);
+      std::make_shared<graphicsutils::Program3d> (
+          "shaders/vertex_box.glsl",
+          "shaders/fragment_box.glsl",
+          &camera));
 
   // ---------------- GENERATE RECTANGLE -----------------
-  box = new Box(&programs[0], &tex_factory);
-  world = new World(&programs[0], &tex_factory);
+  world = new World(programs[0], &tex_factory);
 }
 
 int main(int argc, char** argv) {
@@ -144,13 +125,7 @@ int main(int argc, char** argv) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    
-    programs[0].use();
-    programs[0].setFloat("scale", 1.0f);
-    programs[0].setMatrix("view", camera.getView());
-    for (int i = 0; i < num_positions; i ++) {
-      world->draw(cam_pos);
-    } 
+    world->draw(cam_pos);
 
     glUseProgram(0);
     

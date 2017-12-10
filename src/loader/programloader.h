@@ -6,13 +6,15 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 
-namespace graphicsutils {
+#include "camera.h"
 
+namespace graphicsutils {
+  
 class ProgramLoader {
   public:
   ProgramLoader(std::string v_glsl, std::string f_glsl);
 
-  void use();
+  virtual void use();
 
   void setInt(const std::string &name, int value) const;
   void setFloat(const std::string &name, float value) const;
@@ -28,6 +30,20 @@ class ProgramLoader {
   GLchar error[512];
   
   GLint load_shader(std::string file_name, GLenum shadertype, GLuint& shader);
+};
+
+class Program3d : public ProgramLoader {
+  public:
+  Program3d(
+      std::string v_glsl,
+      std::string f_glsl,
+      Camera *camera);
+
+  virtual void use();
+
+  private:
+  Camera *_camera;
+
 };
 
 } //namespace graphicsutils

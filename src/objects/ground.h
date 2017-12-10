@@ -14,7 +14,7 @@
 
 class Ground: public Object {
   public:
-  Ground(graphicsutils::ProgramLoader *program,
+  Ground(std::shared_ptr<graphicsutils::ProgramLoader> program,
       TextureFactory *textures,
       int width, int depth,
       std::shared_ptr<const std::vector<GLfloat> > heights,

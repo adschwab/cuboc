@@ -15,7 +15,7 @@ struct Attribute {
 
 class Object {
   public:
-  Object(graphicsutils::ProgramLoader *program);
+  Object(std::shared_ptr<graphicsutils::ProgramLoader> program);
   ~Object();
 
   void init();
@@ -30,7 +30,7 @@ class Object {
   GLfloat* _data;
   int _size;
   int _stride;
-  graphicsutils::ProgramLoader *_program;
+  std::shared_ptr<graphicsutils::ProgramLoader> _program;
   std::vector<Attribute> _attr_info;
 };
 

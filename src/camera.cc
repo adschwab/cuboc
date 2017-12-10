@@ -5,13 +5,20 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "window.h"
+
 #define PI 3.1415927f
 
 
-Camera::Camera(glm::vec3 pos, 
-    float xy_angle, float yz_angle,
+Camera::Camera(
+    base::Window *window,
+    glm::vec3 pos, 
+    float xy_angle,
+    float yz_angle,
     float sensitivity):
-      _pos(pos), _xy(xy_angle),
+      _window(window),
+      _pos(pos),
+      _xy(xy_angle),
       _yz(yz_angle), 
       _root_forward(glm::vec3(0.0f, 0.0f, 1.0f)),
       _sensitivity(sensitivity) {
@@ -24,6 +31,14 @@ float Camera::getXY() {
 
 float Camera::getYZ() {
   return _yz;
+}
+
+glm::mat4 Camera::getProj() {
+  return glm::perspective(
+      glm::radians(45.0f),
+      (float)_window->getWidth()/(float)_window->getHeight(),
+      0.1f,
+      100.0f); 
 }
 
 glm::mat4 Camera::getView() {

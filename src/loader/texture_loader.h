@@ -12,7 +12,8 @@ class TextureLoader {
   public:
   TextureLoader(std::string filename);
   
-  void set(graphicsutils::ProgramLoader *program);
+  void set(
+      std::shared_ptr<graphicsutils::ProgramLoader> program);
 
   private:
   GLuint texId;

@@ -22,7 +22,7 @@ void GroundObj::draw() {
 }
 
 World::World(
-    graphicsutils::ProgramLoader *program,
+    std::shared_ptr<graphicsutils::ProgramLoader> program,
     TextureFactory *textures,
     float render_dist) :
       _program(program),
@@ -48,6 +48,7 @@ void World::init() {
 }
 
 void World::draw(glm::vec3 vec) {
+  _program->use();
   XYCoord cam(vec);
   for (auto it = _blocks.begin(); it != _blocks.end(); ++it) {
 

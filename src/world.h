@@ -70,7 +70,7 @@ class World {
 
   public:
   World(
-      graphicsutils::ProgramLoader *program,
+      std::shared_ptr<graphicsutils::ProgramLoader> program,
       TextureFactory *textures,
       float render_dist=DEFAULT_RENDER_DIST);
 
@@ -79,7 +79,7 @@ class World {
   void draw(glm::vec3 vec);
 
   private:
-  graphicsutils::ProgramLoader *_program;
+  std::shared_ptr<graphicsutils::ProgramLoader> _program;
   TextureFactory *_textures;
 
   std::unordered_map<XYCoord, Block> _blocks;

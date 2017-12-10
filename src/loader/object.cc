@@ -8,8 +8,9 @@
 
 #include "loader/programloader.h"
 
-Object::Object(graphicsutils::ProgramLoader *program):
-    _program(program) {
+Object::Object(
+    std::shared_ptr<graphicsutils::ProgramLoader> program):
+      _program(program) {
   
   glGenBuffers(1, &VBO);
   glGenVertexArrays(1, &VAO);

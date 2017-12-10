@@ -12,7 +12,8 @@
 #include "loader/programloader.h"
 #include "loader/texture_loader.h"
 
-Ground::Ground(graphicsutils::ProgramLoader *program,
+Ground::Ground(
+    std::shared_ptr<graphicsutils::ProgramLoader> program,
     TextureFactory *textures,
     int width, int depth,
     std::shared_ptr<const std::vector<GLfloat>> heights,

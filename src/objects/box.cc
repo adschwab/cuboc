@@ -6,7 +6,7 @@
 #include "loader/texture_loader.h"
 
 Box::Box(
-    graphicsutils::ProgramLoader *program,
+    std::shared_ptr<graphicsutils::ProgramLoader> program,
     TextureFactory *textures) :
       Object(program),
       _textures(textures),

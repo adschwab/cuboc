@@ -4,16 +4,21 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include "window.h"
+
 #define DEFAULT_SENSITIVITY 5
 
 class Camera {
   
   public:
-  Camera(glm::vec3 pos,
+  Camera(
+      base::Window *window,
+      glm::vec3 pos,
       float xy_angle,
       float yz_angle,
       float sensitivity=DEFAULT_SENSITIVITY);
   
+  glm::mat4 getProj();
   glm::mat4 getView();
   glm::vec3 getPosition();
   
@@ -32,7 +37,7 @@ class Camera {
   private:
 
   glm::quat rotation(glm::vec3 start, glm::vec3 dest);
-
+  base::Window *_window;
   glm::mat4 view;
   glm::vec3 _root_forward;
   glm::vec3 _pos;
