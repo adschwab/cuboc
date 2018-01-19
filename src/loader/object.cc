@@ -13,12 +13,16 @@ Object::Object(
       _program(program) {
   
   glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
   glGenVertexArrays(1, &VAO);
+
+  _isize = 0;
 }
 
 Object::~Object() {
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
+  glDeleteBuffers(1, &EBO);
 }
 
 void Object::init() {
@@ -46,6 +50,15 @@ void Object::init() {
     glEnableVertexAttribArray(i);
     startcnt += attr.num;
   }
+
+  if (_isize) {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        sizeof(GLubyte) * _isize,
+        _indices,
+        GL_STATIC_DRAW);
+  }
   glBindVertexArray(0);
 }
 
@@ -58,7 +71,11 @@ void Object::draw(glm::vec3 pos) {
   pos[1] = -pos[1];
   model = glm::translate(model, -pos);
   _program->setMatrix("model", model);
-  glDrawArrays(GL_TRIANGLES, 0, _size);
+  if (_isize)
+    glDrawElements(GL_TRIANGLES, _isize, GL_UNSIGNED_BYTE, 0);
+  else
+    glDrawArrays(GL_TRIANGLES, 0, _size);
+
   glBindVertexArray(0);
 }
 

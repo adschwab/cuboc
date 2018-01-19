@@ -12,8 +12,10 @@ Box::Box(
       _textures(textures),
       texture_key("dirt"){
   _data = entity::box_data;
-  _size = 36; 
+  _size = 24; 
   _stride = 5;
+  _indices = entity::box_indices;
+  _isize = 36;
 
   Attribute vertex;
   vertex.num = 3;

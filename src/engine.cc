@@ -13,6 +13,7 @@
 #include "loader/programloader.h"
 #include "loader/texture_loader.h"
 #include "world.h"
+#include "objects/box.h"
 
 int target_fps = 30;
 GLfloat loop_time = 1/(float)target_fps;
@@ -20,6 +21,7 @@ GLfloat loop_time = 1/(float)target_fps;
 std::vector<std::shared_ptr<graphicsutils::ProgramLoader> >
     programs;
 World *world = NULL;
+Box *box = NULL;
 
 base::Window window = base::Window(1000, 600, "Window Fun");
 TextureFactory tex_factory("textures");
@@ -104,7 +106,8 @@ void initGL() {
           &camera));
 
   // ---------------- GENERATE RECTANGLE -----------------
-  world = new World(programs[0], &tex_factory);
+  //world = new World(programs[0], &tex_factory);
+  box = new Box(programs[0], &tex_factory);
 }
 
 int main(int argc, char** argv) {
@@ -125,8 +128,8 @@ int main(int argc, char** argv) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    world->draw(cam_pos);
-
+    //world->draw(cam_pos);
+    box->draw(cam_pos);
     glUseProgram(0);
     
     GLfloat time = glfwGetTime();
