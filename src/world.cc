@@ -73,7 +73,7 @@ void World::draw(glm::vec3 vec) {
     if (!_cache.contains(key) || !ground_obj) {
       std::shared_ptr<Ground> ground = 
           std::make_shared<Ground>(
-              _program,
+              _program.get(),
               _textures,
               BLOCK_SIZE,
               BLOCK_SIZE,
@@ -96,7 +96,7 @@ void World::draw(glm::vec3 vec) {
       }
       std::shared_ptr<Ground> xground = 
           std::make_shared<Ground>(
-              _program,
+              _program.get(),
               _textures,
               2,
               BLOCK_SIZE,
@@ -121,7 +121,7 @@ void World::draw(glm::vec3 vec) {
       }
       std::shared_ptr<Ground> yground =
           std::make_shared<Ground>(
-              _program,
+              _program.get(),
               _textures,
               BLOCK_SIZE,
               2,
@@ -149,7 +149,7 @@ void World::draw(glm::vec3 vec) {
           (*heights)[0]);
       std::shared_ptr<Ground> xyground =
           std::make_shared<Ground>(
-              _program,
+              _program.get(),
               _textures,
               2,
               2,

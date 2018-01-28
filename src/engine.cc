@@ -107,7 +107,7 @@ void initGL() {
 
   // ---------------- GENERATE RECTANGLE -----------------
   //world = new World(programs[0], &tex_factory);
-  box = new Box(programs[0], &tex_factory);
+  box = new Box(programs[0].get(), &tex_factory);
 }
 
 int main(int argc, char** argv) {

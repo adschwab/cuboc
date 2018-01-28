@@ -2,41 +2,25 @@
 #define OBJECT_H
 
 #include <vector>
+#include <memory>
 
-#include <GL/glew.h>
 #include <glm/glm.hpp>
 
 #include "loader/programloader.h"
-#include "loader/texture_loader.h"
-
-struct Attribute {
-  int num;
-};
-
-
+#include "glwrapper/buffer.h"
 
 class Object {
   public:
-  Object(std::shared_ptr<graphicsutils::ProgramLoader> program);
+  Object(graphicsutils::ProgramLoader *program);
   ~Object();
 
-  void init();
+  virtual void set() = 0;
 
-  virtual void set();
   virtual void draw(glm::vec3 pos);
 
   protected:
-  GLuint VAO;
-  GLuint VBO;
-  GLuint EBO;
-
-  GLfloat* _data;
-  int _size;
-  GLubyte* _indices;
-  int _isize;
-  int _stride;
-  std::shared_ptr<graphicsutils::ProgramLoader> _program;
-  std::vector<Attribute> _attr_info;
+  std::unique_ptr<glw::ArrayObject> array_object;
+  graphicsutils::ProgramLoader *_program;
 };
 
 

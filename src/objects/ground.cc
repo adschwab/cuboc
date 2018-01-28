@@ -13,7 +13,7 @@
 #include "loader/texture_loader.h"
 
 Ground::Ground(
-    std::shared_ptr<graphicsutils::ProgramLoader> program,
+    graphicsutils::ProgramLoader *program,
     TextureFactory *textures,
     int width, int depth,
     std::shared_ptr<const std::vector<GLfloat>> heights,
@@ -25,7 +25,6 @@ Ground::Ground(
       _heights(heights),
       _tex_id(tex_id) {
   _size = 0;
-  _stride = 3;
   
   for (int i = 0; i < _width - 1; i ++) {
     for (int j = 0; j < _depth - 1; j ++) {
@@ -56,15 +55,16 @@ Ground::Ground(
     }
 
   }
-  _data = temp_floats.data();
+  std::vector<float> data;
+  data.assign(temp_floats.data(), temp_floats.data() + temp_floats.size());;
 
-  Attribute vertex;
+  std::vector<glw::BufferAttr> attr_info;
+  glw::BufferAttr vertex;
   vertex.num = 3;
-  _attr_info.push_back(vertex);
-  Attribute tex;
+  attr_info.push_back(vertex);
+  glw::BufferAttr tex;
   tex.num = 2;
-  _attr_info.push_back(tex);
-  init();
+  attr_info.push_back(tex);
   temp_floats.clear();
 }
 

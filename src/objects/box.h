@@ -9,7 +9,7 @@
 class Box: public Object {
 
   public:
-  Box(std::shared_ptr<graphicsutils::ProgramLoader> program,
+  Box(graphicsutils::ProgramLoader *program,
       TextureFactory *textures);
 
   virtual void set();

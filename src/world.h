@@ -14,7 +14,7 @@
 #include "util/hashkey.h"
 #include "util/cache.h"
 
-#define BLOCK_SIZE 2
+#define BLOCK_SIZE 4
 #define DEFAULT_RENDER_DIST 10
 
 struct GroundObj {

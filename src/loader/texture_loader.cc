@@ -44,7 +44,7 @@ TextureLoader::TextureLoader(std::string filename) {
 }
 
 void TextureLoader::set(
-    std::shared_ptr<graphicsutils::ProgramLoader> program) {
+    graphicsutils::ProgramLoader *program) {
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, texId);
   program->use();
