@@ -5,6 +5,8 @@
 
 #include <glm/glm.hpp>
 
+#include "util/hashalg.h"
+
 struct XYCoord {
   
   union coords {
@@ -74,6 +76,65 @@ template<>
 struct std::hash<XYCoord> {
   std::size_t operator()(const XYCoord& k) const {
     return std::hash<double>()(k.coords.hash);
+  }
+};
+
+struct XYZCoord {
+  
+  int coords[3];
+
+  XYZCoord() {
+    this->setX(0);
+    this->setY(0);
+    this->setZ(0);
+  }
+
+  XYZCoord(int x_, int y_, int z_) {
+    this->setX(x_);
+    this->setY(y_);
+    this->setZ(z_);
+  }
+
+  int x() const {
+    return coords[0];
+  }
+
+  int y() const {
+    return coords[1];
+  }
+  
+  int z() const {
+    return coords[2];
+  }
+
+  void setX(int x) {
+    coords[0] = x;
+  }
+
+  void setY(int y) {
+    coords[1] = y;
+  }
+  
+  void setZ(int z) {
+    coords[2] = z;
+  }
+
+  bool operator==(const XYZCoord &other) const{
+    return (this->x() == other.x()
+        && this->y() == other.y()
+        && this->z() == other.z());
+  }
+
+  bool operator!=(const XYZCoord &other) const{
+    return !(*this == other);
+  }
+
+};
+
+template<>
+struct std::hash<XYZCoord> {
+  std::size_t operator()(const XYZCoord& k) const {
+    return hashalg::hash((void *)k.coords, 12);
   }
 };
 

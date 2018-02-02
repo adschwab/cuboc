@@ -14,7 +14,7 @@ class TextureLoader {
   
   void set(graphicsutils::ProgramLoader *program);
 
-  private:
+  protected:
   GLuint texId;
 };
 
@@ -30,13 +30,9 @@ class TextureFactory {
 
   TextureLoader *get(std::string key);
   
-  TextureLoader *get(int id);
-
   private:
   std::unordered_map
-      <int, TextureLoader> _textures;
-  std::unordered_map
-      <std::string, int> _idmap;
+      <std::string, TextureLoader> _textures;
 };
 
 #endif

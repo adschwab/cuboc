@@ -69,7 +69,13 @@ Ground::Ground(
 }
 
 void Ground::set() {
-  TextureLoader *texture = _textures->get(_tex_id);
+  std::string key;
+  if (_tex_id == 0) {
+    key = "dirt";
+  } else {
+    key = "grass";
+  }
+  TextureLoader *texture = _textures->get(key);
   texture->set(_program);
 }
 
