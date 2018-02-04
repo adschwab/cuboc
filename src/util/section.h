@@ -1,9 +1,10 @@
 #ifndef SECTION_H
 #define SECTION_H
 
+#include <cassert>
 #include <array>
 
-#define SECTION_SIZE 2
+#define SECTION_SIZE 5
 
 namespace temp_utils {
 
@@ -20,15 +21,39 @@ struct cube {
 }
 
 template<typename T, size_t edge = temp_utils::pow2<SECTION_SIZE>::value>
-struct Section {
-  T get(int x, int y, int z) {
+struct Section : BaseSection<T, edge> {
+  virtual T get(int x, int y, int z) {
+    assert(x < edge);
+    assert(y < edge);
+    assert(z < edge);
     return arr[x * edge * edge + y * edge + z];
   }
 
-  void set(T item, int x, int y, int z) {
+  virtual void set(T item, int x, int y, int z) {
+    assert(x < edge);
+    assert(y < edge);
+    assert(z < edge);
     arr[x * edge * edge + y * edge + z] = item;
   }
 
+  virtual bool isContiguous() { return false; }
+
   std::array<T, temp_utils::cube<edge>::volume> arr;
 };
+
+template<typename T, size_t edge = temp_utils::pow2<SECTION_SIZE>::value>
+struct BaseSection {
+  virtual T get(int x, int y, int z) {
+    assert(x < edge);
+    assert(y < edge);
+    assert(z < edge);
+    return T;
+  }
+
+  virtual void set(T item, int x, int y, int z) = 0;
+
+  virtual bool isContiguous() { return true; }
+
+  size_t get_edge() { return edge; }
+}
 #endif

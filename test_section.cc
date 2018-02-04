@@ -4,7 +4,12 @@
 int main() {
   
   Section<int> section;
-  section.set(4,1,1,1);
-  std::printf("%d\n", section.get(1,1,1));
+  
+  std::printf("Edge: %lu\n", section.get_edge());
+  std::printf("Size: %lu\n", section.arr.size());
+  section.set(4,4,1,1);
+
+  std::printf("%d\n", section.get(4,1,1));
+
   return 0;
 }

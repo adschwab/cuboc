@@ -1,94 +1,52 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include <unordered_map>
-#include <vector>
 #include <memory>
 
 #include <glm/glm.hpp>
 
 #include "loader/programloader.h"
 #include "loader/texture_loader.h"
+#include "glwrapper/buffer.h"
+#include "block.h"
 
-#include "objects/ground.h"
 #include "util/hashkey.h"
 #include "util/cache.h"
+#include "util/section.h"
 
-#define BLOCK_SIZE 4
 #define DEFAULT_RENDER_DIST 10
+#define BLOCK_SIZE 1.0f
+namespace cuboc {
 
-struct GroundObj {
-
-  std::shared_ptr<Ground> main;
-  XYCoord main_pos;
-  std::shared_ptr<Ground> x;
-  XYCoord xpos;
-  std::shared_ptr<Ground> y;
-  XYCoord ypos;
-  std::shared_ptr<Ground> xy;
-  XYCoord xypos;
-
-  void draw();
-};
-
-class Block {
+class DrawableSection {
   public:
-  Block(
-      std::shared_ptr<std::vector<float> > heights,
-      std::shared_ptr<std::vector<int> > tex_ids):
-    _heights(heights), _tex_ids(tex_ids) {}
+  DrawableSection(BaseSection<BaseBlock> *section);
 
-  ~Block() {}
-
-  std::shared_ptr<const std::vector<float> > get() {
-    return _heights;
-  }
-  
-  int getMainTex() {
-    return (*_tex_ids)[0];
-  }
-
-  int getXTex() {
-    return (*_tex_ids)[1];
-  }
-
-  int getYTex() {
-    return (*_tex_ids)[2];
-  }
-
-  int getXYTex() {
-    return (*_tex_ids)[3];
-  }
+  void draw(glm::vec3 offset);
   
   private:
-  std::shared_ptr<std::vector<float> > _heights;
-  std::shared_ptr<std::vector<int> > _tex_ids;
-
+  ArrayObject ao;
 };
+
 
 class World {
 
   public:
   World(
-      std::shared_ptr<graphicsutils::ProgramLoader> program,
-      TextureFactory *textures,
-      float render_dist=DEFAULT_RENDER_DIST);
+      graphicsutils::ProgramLoader *program,
+      TextureFactory *atlas);
 
-  void init();
-
-  void draw(glm::vec3 vec);
+  void draw(XYZCoord coord_pos, glm::vec3 offset);
 
   private:
-  std::shared_ptr<graphicsutils::ProgramLoader> _program;
-  TextureFactory *_textures;
+  graphicsutils::ProgramLoader *_program;
+  TextureFactory *_tex_atlas;
 
-  std::unordered_map<XYCoord, Block> _blocks;
-  util::Cache<XYCoord, GroundObj > _cache;
-
-  float _render_dist;
+  util::Cache<XYZCoord, BaseSection<Block> > _raw;
+  util::Cache<XYZCoord, DrawableSection > *_draw_cache;
 };
 
-
+}
 
 
 #endif
