@@ -21,7 +21,23 @@ struct cube {
 }
 
 template<typename T, size_t edge = temp_utils::pow2<SECTION_SIZE>::value>
-struct Section : BaseSection<T, edge> {
+struct BaseSection {
+  virtual T get(int x, int y, int z) {
+    assert(x < edge);
+    assert(y < edge);
+    assert(z < edge);
+    return T();
+  }
+
+  virtual void set(T item, int x, int y, int z) = 0;
+
+  virtual bool isContiguous() { return true; }
+
+  size_t get_edge() { return edge; }
+};
+
+template<typename T, size_t edge = temp_utils::pow2<SECTION_SIZE>::value>
+struct Section : public BaseSection<T, edge> {
   virtual T get(int x, int y, int z) {
     assert(x < edge);
     assert(y < edge);
@@ -41,19 +57,4 @@ struct Section : BaseSection<T, edge> {
   std::array<T, temp_utils::cube<edge>::volume> arr;
 };
 
-template<typename T, size_t edge = temp_utils::pow2<SECTION_SIZE>::value>
-struct BaseSection {
-  virtual T get(int x, int y, int z) {
-    assert(x < edge);
-    assert(y < edge);
-    assert(z < edge);
-    return T;
-  }
-
-  virtual void set(T item, int x, int y, int z) = 0;
-
-  virtual bool isContiguous() { return true; }
-
-  size_t get_edge() { return edge; }
-}
 #endif

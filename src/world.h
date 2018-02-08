@@ -20,12 +20,56 @@ namespace cuboc {
 
 class DrawableSection {
   public:
-  DrawableSection(BaseSection<BaseBlock> *section);
+  DrawableSection(
+      std::shared_ptr<BaseSection<BaseBlock> > section);
 
   void draw(glm::vec3 offset);
   
   private:
-  ArrayObject ao;
+  static float tex_arr_x[TEX_WIDTH][4];
+  static float tex_arr_y[TEX_WIDTH][4];  
+  static bool static_init;
+
+  void add_bottom_top(
+      std::vector<float> &v,
+      std::vector<unsigned char> &ind,
+      float x, float y, float z,
+      float sz,
+      char tex_type, short tex_row,
+      char rotation);
+  
+  void add_left_right(
+      std::vector<float> &v,
+      std::vector<unsigned char> &ind,
+      float x, float y, float z,
+      float sz,
+      char tex_type, short tex_row,
+      char rotation);
+  
+  void add_front_back(
+      std::vector<float> &v,
+      std::vector<unsigned char> &ind,
+      float x, float y, float z,
+      float sz,
+      char tex_type, short tex_row,
+      char rotation);
+  
+
+  void add_vertex(
+      std::vector<float> &vertices,
+      float px,
+      float py,
+      float pz,
+      float xtex,
+      float ytex);
+
+  void add_triangle(
+      std::vector<unsigned char> &inds,
+      unsigned char ind1,
+      unsigned char ind2,
+      unsigned char ind3);
+
+  glw::ArrayObject ao;
 };
 
 
@@ -42,7 +86,7 @@ class World {
   graphicsutils::ProgramLoader *_program;
   TextureFactory *_tex_atlas;
 
-  util::Cache<XYZCoord, BaseSection<Block> > _raw;
+  util::Cache<XYZCoord, BaseSection<BaseBlock> > _raw;
   util::Cache<XYZCoord, DrawableSection > *_draw_cache;
 };
 

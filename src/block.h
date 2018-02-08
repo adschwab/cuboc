@@ -7,36 +7,43 @@
 #define BLOCK_AIR 0
 #define BLOCK_EARTH 1
 
+
+#define TEX_HEIGHT 3
+#define TEX_WIDTH 2
+
 // Texture types
 #define TEX_ONE 1
+#define TEX_TWO 2
 
 namespace cuboc {
+  
+  struct BaseParams {};
 
-  struct GrassBlock : BaseBlock {
+  struct BaseBlock {
+    BaseBlock(short type) : type_(type) {}
+
+    short getType() { return type_; }
+    virtual short getTexRow() = 0;
+    virtual char getTexType() = 0;
+
+    short type_;
+    std::unique_ptr<BaseParams> params;
+  };
+
+  struct GrassBlock : public BaseBlock {
     GrassBlock() :
-        type(BLOCK_EARTH) {}
+        BaseBlock(BLOCK_EARTH) {}
     virtual short getTexRow() {
       return 0;
     }
     virtual char getTexType() {
       return TEX_ONE;
     }
-  }
+  };
 
-  struct AirBlock : BaseBlock {
+  struct AirBlock : public BaseBlock {
     AirBlock() :
-        type(BLOCK_AIR) {}
-  } 
-
-  struct BaseParams {};
-
-  struct BaseBlock {
-    short getType() { return type; }
-    virtual short getTexRow() = 0;
-    virtual char getTexType() = 0;
-
-    short type;
-    std::unique_ptr<BaseParams> params;
+        BaseBlock(BLOCK_AIR) {}
   };
 }
 
