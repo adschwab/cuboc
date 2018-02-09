@@ -14,13 +14,15 @@
 #include "loader/texture_loader.h"
 #include "world.h"
 #include "objects/box.h"
+#include "util/hashkey.h"
 
 int target_fps = 30;
 GLfloat loop_time = 1/(float)target_fps;
 
 std::vector<std::shared_ptr<graphicsutils::ProgramLoader> >
     programs;
-World *world = NULL;
+
+cuboc::World *world;
 Box *box = NULL;
 
 base::Window window = base::Window(1000, 600, "Window Fun");
@@ -31,7 +33,9 @@ double mouseY = window.getHeight()/2;
 bool mouse_set = false;
 
 glm::vec3 cam_pos = glm::vec3(0.0f, 2.0f, 0.0f);
-Camera camera = Camera(&window, cam_pos, 0.0f, 0.0f);
+XYZCoord cam_ind = XYZCoord();
+
+Camera camera = Camera(&window, cam_pos, -3.0f * 3.14 / 4.0f, 0.0f);
 Movement movement = Movement(&camera);
 
 static void err_callback(
@@ -106,8 +110,8 @@ void initGL() {
           &camera));
 
   // ---------------- GENERATE RECTANGLE -----------------
-  //world = new World(programs[0], &tex_factory);
-  box = new Box(programs[0].get(), &tex_factory);
+  world = new cuboc::World(programs[0].get(), tex_factory.get("grounds_atlas"));
+  //box = new Box(programs[0].get(), &tex_factory);
 }
 
 int main(int argc, char** argv) {
@@ -128,8 +132,8 @@ int main(int argc, char** argv) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    //world->draw(cam_pos);
-    box->draw(cam_pos);
+    world->draw(cam_ind, glm::vec3());
+    //box->draw(cam_pos);
     glUseProgram(0);
     
     GLfloat time = glfwGetTime();

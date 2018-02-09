@@ -1,5 +1,7 @@
 #include "camera.h"
 
+#include <cstdio>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -58,6 +60,8 @@ void Camera::updateAngles(
     float xdiff,
     float ydiff) {
   _xy = _xy - xdiff * PI/(180.0f * _sensitivity);
+  if (_xy > PI) _xy = _xy - 2.0f * PI;
+  else if (_xy < -PI) _xy = _xy + 2.0f * PI;
   _yz = glm::max(glm::min(
       _yz - ydiff * PI/(180.0f * _sensitivity),
       PI/2.0f),-PI/2.0f);

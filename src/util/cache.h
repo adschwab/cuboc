@@ -12,7 +12,7 @@ class Cache {
   public:
   Cache(int size=DEFAULT_SIZE) :
       _size(size) {
-    _cache = std::vector<std::shared_ptr<D> >(size);
+    _cache = std::vector<D>(size);
     _addrs = std::vector<I>(size);
   }
 
@@ -20,18 +20,18 @@ class Cache {
     return index == _addrs[hash_fn(index) % _size];
   }
 
-  std::shared_ptr<D> get(I index) {
+  D get(I index) {
     return _cache[hash_fn(index) % _size];
   }
 
-  void add(I index, std::shared_ptr<D> data) {
+  void add(I index, D data) {
     _addrs[hash_fn(index) % _size] = index;
     _cache[hash_fn(index) % _size] = data;
   }
 
   private:
   int _size;
-  std::vector<std::shared_ptr<D> > _cache;
+  std::vector<D> _cache;
   std::vector<I> _addrs;
   std::hash<I> hash_fn;
 };
