@@ -8,6 +8,10 @@
 
 #include "util/section.h"
 
+#define XYAXIS 1
+#define YZAXIS 2
+#define XZAXIS 3
+
 namespace cuboc {
 
 class DrawableSection {
@@ -27,27 +31,11 @@ class DrawableSection {
   static float tex_arr_y[TEX_WIDTH][4];  
   static bool static_init;
 
-  static void add_bottom_top(
+  static void add_face(
       std::vector<float> &v,
       std::vector<unsigned char> &ind,
       float x, float y, float z,
-      float sz,
-      char tex_type, short tex_row,
-      char rotation);
-  
-  static void add_left_right(
-      std::vector<float> &v,
-      std::vector<unsigned char> &ind,
-      float x, float y, float z,
-      float sz,
-      char tex_type, short tex_row,
-      char rotation);
-  
-  static void add_front_back(
-      std::vector<float> &v,
-      std::vector<unsigned char> &ind,
-      float x, float y, float z,
-      float sz,
+      float sz, char axis,
       char tex_type, short tex_row,
       char rotation);
   

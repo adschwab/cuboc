@@ -15,99 +15,38 @@ void DrawableSection::draw(glm::vec3 offset) {
   ao_->draw();
 }
 
-void DrawableSection::add_bottom_top(
+void DrawableSection::add_face(
     std::vector<float> &v, 
     std::vector<unsigned char> &ind,
     float x, float y, float z,
-    float sz, 
+    float sz, char axis,
     char tex_type, short tex_row,
     char rotation) {
   auto curr_ind = v.size() / 5;
   float tex_offset = tex_row / (float)TEX_HEIGHT;
-  char tex_ind = tex_type == TEX_ONE ? 0 : 1;
-  add_vertex(
-      v, x, z, y,
-      DrawableSection::tex_arr_x[tex_ind][rotation % 4],
-      DrawableSection::tex_arr_y[tex_ind][rotation % 4] + tex_offset);
-  add_vertex(
-      v, x, z, y + sz,
-      DrawableSection::tex_arr_x[tex_ind][(rotation + 1) % 4],
-      DrawableSection::tex_arr_y[tex_ind][(rotation + 1) % 4] + tex_offset);
-  add_vertex(
-      v, x + sz, z, y + sz,
-      DrawableSection::tex_arr_x[tex_ind][(rotation + 2) % 4],
-      DrawableSection::tex_arr_y[tex_ind][(rotation + 2) % 4] + tex_offset);
-  add_vertex(
-      v, x + sz, z, y,
-      DrawableSection::tex_arr_x[tex_ind][(rotation + 3) % 4],
-      DrawableSection::tex_arr_y[tex_ind][(rotation + 3) % 4] + tex_offset);
   
-  add_triangle(
-      ind, curr_ind, curr_ind + 1, curr_ind + 2);
-  add_triangle(
-      ind, curr_ind + 2, curr_ind + 3, curr_ind);
-
-}
-
-void DrawableSection::add_left_right(
-    std::vector<float> &v, 
-    std::vector<unsigned char> &ind,
-    float x, float y, float z,
-    float sz, 
-    char tex_type, short tex_row,
-    char rotation) {
-  auto curr_ind = v.size() / 5;
-  float tex_offset = tex_row / (float)TEX_HEIGHT;
-
+  char xtex_ind = 0;
+  if (axis == XYAXIS && tex_type >= TEX_TWO)
+    xtex_ind = 1; 
+  float xyoff = (axis == XYAXIS) ? sz : 0.0f;
+  float xzoff = (axis == XZAXIS) ? sz : 0.0f;
+  float yzoff = (axis == YZAXIS) ? sz : 0.0f;
   add_vertex(
-      v, x + sz, z, y,
-      DrawableSection::tex_arr_x[0][rotation % 4],
-      DrawableSection::tex_arr_y[0][rotation % 4] + tex_offset);
+      v, x + xzoff, z, y,
+      DrawableSection::tex_arr_x[xtex_ind][rotation % 4],
+      DrawableSection::tex_arr_y[xtex_ind][rotation % 4] + tex_offset);
   add_vertex(
-      v, x + sz, z + sz, y,
-      DrawableSection::tex_arr_x[0][(rotation + 1) % 4],
-      DrawableSection::tex_arr_y[0][(rotation + 1) % 4] + tex_offset);
+      v, x + xzoff, z + xzoff + yzoff, y + xyoff,
+      DrawableSection::tex_arr_x[xtex_ind][(rotation + 1) % 4],
+      DrawableSection::tex_arr_y[xtex_ind][(rotation + 1) % 4] + tex_offset);
   add_vertex(
-      v, x, z + sz, y,
-      DrawableSection::tex_arr_x[0][(rotation + 2) % 4],
-      DrawableSection::tex_arr_y[0][(rotation + 2) % 4] + tex_offset);
+      v, x + xyoff, z + xzoff + yzoff, y + xyoff + yzoff,
+      DrawableSection::tex_arr_x[xtex_ind][(rotation + 2) % 4],
+      DrawableSection::tex_arr_y[xtex_ind][(rotation + 2) % 4] + tex_offset);
   add_vertex(
-      v, x, z, y,
-      DrawableSection::tex_arr_x[0][(rotation + 3) % 4],
-      DrawableSection::tex_arr_y[0][(rotation + 3) % 4] + tex_offset);
-  
-  add_triangle(
-      ind, curr_ind, curr_ind + 1, curr_ind + 2);
-  add_triangle(
-      ind, curr_ind + 2, curr_ind + 3, curr_ind);
-
-}
-
-void DrawableSection::add_front_back(
-    std::vector<float> &v, 
-    std::vector<unsigned char> &ind,
-    float x, float y, float z,
-    float sz, 
-    char tex_type, short tex_row,
-    char rotation) {
-  auto curr_ind = v.size() / 5;
-  float tex_offset = tex_row / (float)TEX_HEIGHT;
-  add_vertex(
-      v, x, z, y,
-      DrawableSection::tex_arr_x[0][rotation % 4],
-      DrawableSection::tex_arr_y[0][rotation % 4] + tex_offset);
-  add_vertex(
-      v, x, z + sz, y,
-      DrawableSection::tex_arr_x[0][(rotation + 1) % 4],
-      DrawableSection::tex_arr_y[0][(rotation + 1) % 4] + tex_offset);
-  add_vertex(
-      v, x, z + sz, y + sz,
-      DrawableSection::tex_arr_x[0][(rotation + 2) % 4],
-      DrawableSection::tex_arr_y[0][(rotation + 2) % 4] + tex_offset);
-  add_vertex(
-      v, x, z, y + sz,
-      DrawableSection::tex_arr_x[0][(rotation + 3) % 4],
-      DrawableSection::tex_arr_y[0][(rotation + 3) % 4] + tex_offset);
+      v, x + xyoff, z, y + yzoff,
+      DrawableSection::tex_arr_x[xtex_ind][(rotation + 3) % 4],
+      DrawableSection::tex_arr_y[xtex_ind][(rotation + 3) % 4] + tex_offset);
   
   add_triangle(
       ind, curr_ind, curr_ind + 1, curr_ind + 2);
@@ -126,19 +65,19 @@ DrawableSection::DrawableSection(
     for (int i = 0; i < TEX_WIDTH; i ++) {
       // Bottom left
       DrawableSection::tex_arr_x[i][0] = 0.0f + i * tex_mult;
-      DrawableSection::tex_arr_y[i][0] = 0.0f;
+      DrawableSection::tex_arr_y[i][0] = 1.0f / (float)TEX_HEIGHT;;
     
       // Top left
       DrawableSection::tex_arr_x[i][1] = 0.0f + i * tex_mult;
-      DrawableSection::tex_arr_y[i][1] = 1.0f / (float)TEX_HEIGHT;
+      DrawableSection::tex_arr_y[i][1] = 0.0f;
 
       // Top right
       DrawableSection::tex_arr_x[i][2] = (i + 1) * tex_mult;
-      DrawableSection::tex_arr_y[i][2] = 1.0f / (float)TEX_HEIGHT;
+      DrawableSection::tex_arr_y[i][2] = 0.0f;
 
       // Bottom right
       DrawableSection::tex_arr_x[i][3] = (i + 1) * tex_mult;
-      DrawableSection::tex_arr_y[i][3] = 0.0f;
+      DrawableSection::tex_arr_y[i][3] = 1.0f / (float)TEX_HEIGHT;;
     }
     DrawableSection::static_init = true;
   }
@@ -157,44 +96,47 @@ DrawableSection::DrawableSection(
         float j_f = (float) j / size;
         float k_f = (float) k / size;
         
-        add_bottom_top(
+        add_face(
             vertices, indices,
             i_f, j_f, k_f, 
-            size,
+            size, XYAXIS,
             block.getTexType(), block.getTexRow(),
             0);
-        add_bottom_top(
+
+        add_face(
             vertices, indices,
             i_f, j_f, k_f + size, 
-            size,
-            block.getTexType(), block.getTexRow(),
-            2);
-
-        add_left_right(
-            vertices, indices,
-            i_f, j_f, k_f, 
-            size,
+            size, XYAXIS,
             block.getTexType(), block.getTexRow(),
             0);
-        add_left_right(
+
+        add_face(
+            vertices, indices,
+            i_f, j_f, k_f, 
+            size, XZAXIS,
+            block.getTexType(), block.getTexRow(),
+            0);
+
+        add_face(
             vertices, indices,
             i_f, j_f + size, k_f, 
-            size,
-            block.getTexType(), block.getTexRow(),
-            2);
-
-        add_front_back(
-            vertices, indices,
-            i_f, j_f, k_f, 
-            size,
+            size, XZAXIS,
             block.getTexType(), block.getTexRow(),
             0);
-        add_front_back(
+
+        add_face(
+            vertices, indices,
+            i_f, j_f, k_f, 
+            size, YZAXIS,
+            block.getTexType(), block.getTexRow(),
+            0);
+
+        add_face(
             vertices, indices,
             i_f + size, j_f, k_f, 
-            size,
+            size, YZAXIS,
             block.getTexType(), block.getTexRow(),
-            2);
+            0);
       }
     }
   }
