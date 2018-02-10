@@ -6,7 +6,8 @@
 // Block Types
 #define BLOCK_AIR 0
 #define BLOCK_EARTH 1
-#define BLOCK_BOX 2
+#define BLOCK_GRASS 2
+#define BLOCK_BOX 3
 
 // Texture atlas
 #define TEX_HEIGHT 3
@@ -31,10 +32,13 @@ namespace cuboc {
     
     short getTexRow() {
       switch(type_) {
-        case BLOCK_EARTH:
+        case BLOCK_GRASS:
           return 0;
+        case BLOCK_EARTH:
+          return 1;
         case BLOCK_BOX:
           return 2;
+
         
       }
       return TEX_ERROR; // Means N/A type
@@ -42,6 +46,8 @@ namespace cuboc {
 
     char getTexType() {
       switch(type_) {
+        case BLOCK_GRASS:
+          return TEX_ONE;
         case BLOCK_EARTH:
           return TEX_ONE;
         case BLOCK_BOX:

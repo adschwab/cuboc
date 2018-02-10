@@ -4,7 +4,7 @@
 #include <cassert>
 #include <array>
 
-#define SECTION_SIZE 5
+#define SECTION_SIZE 2
 
 namespace temp_utils {
 

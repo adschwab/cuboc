@@ -84,59 +84,70 @@ DrawableSection::DrawableSection(
 
   std::vector<float> vertices;
   std::vector<unsigned char> indices;
-
   for (int i = 0; i < section->get_edge(); i ++) {
     for (int j = 0; j < section->get_edge(); j ++) {
       for (int k = 0; k < section->get_edge(); k ++) {
         cuboc::Block block = section->get(i, j, k);
         if (block.getType() == BLOCK_AIR) continue;
         short tex_row = block.getTexRow();
-
+        
         float i_f = (float) i / size;
         float j_f = (float) j / size;
         float k_f = (float) k / size;
+
+        if (k == 0 ||
+            section->get(i, j, k - 1).getType() == BLOCK_AIR)
+          add_face(
+              vertices, indices,
+              i_f, j_f, k_f, 
+              size, XYAXIS,
+              block.getTexType(), block.getTexRow(),
+              0);
         
-        add_face(
-            vertices, indices,
-            i_f, j_f, k_f, 
-            size, XYAXIS,
-            block.getTexType(), block.getTexRow(),
-            0);
+        if (k == section->get_edge() - 1 ||
+            section->get(i, j, k + 1).getType() == BLOCK_AIR)
+          add_face(
+              vertices, indices,
+              i_f, j_f, k_f + size, 
+              size, XYAXIS,
+              block.getTexType(), block.getTexRow(),
+              0);
+        
+        if (j == 0 ||
+            section->get(i, j - 1, k).getType() == BLOCK_AIR)
+          add_face(
+              vertices, indices,
+              i_f, j_f, k_f, 
+              size, XZAXIS,
+              block.getTexType(), block.getTexRow(),
+              0);
 
-        add_face(
-            vertices, indices,
-            i_f, j_f, k_f + size, 
-            size, XYAXIS,
-            block.getTexType(), block.getTexRow(),
-            0);
+        if (j == section->get_edge() - 1 ||
+           section->get(i, j + 1, k).getType() == BLOCK_AIR)
+          add_face(
+              vertices, indices,
+              i_f, j_f + size, k_f, 
+              size, XZAXIS,
+              block.getTexType(), block.getTexRow(),
+              0);
 
-        add_face(
-            vertices, indices,
-            i_f, j_f, k_f, 
-            size, XZAXIS,
-            block.getTexType(), block.getTexRow(),
-            0);
+        if (i == 0 ||
+            section->get(i - 1, j, k).getType() == BLOCK_AIR)
+          add_face(
+              vertices, indices,
+              i_f, j_f, k_f, 
+              size, YZAXIS,
+              block.getTexType(), block.getTexRow(),
+              0);
 
-        add_face(
-            vertices, indices,
-            i_f, j_f + size, k_f, 
-            size, XZAXIS,
-            block.getTexType(), block.getTexRow(),
-            0);
-
-        add_face(
-            vertices, indices,
-            i_f, j_f, k_f, 
-            size, YZAXIS,
-            block.getTexType(), block.getTexRow(),
-            0);
-
-        add_face(
-            vertices, indices,
-            i_f + size, j_f, k_f, 
-            size, YZAXIS,
-            block.getTexType(), block.getTexRow(),
-            0);
+        if (i == section->get_edge() - 1 || 
+            section->get(i + 1, j, k).getType() == BLOCK_AIR)
+          add_face(
+              vertices, indices,
+              i_f + size, j_f, k_f, 
+              size, YZAXIS,
+              block.getTexType(), block.getTexRow(),
+              0);
       }
     }
   }
@@ -163,7 +174,7 @@ void DrawableSection::add_vertex(
     float pz,
     float xtex,
     float ytex) {
-  std::printf("%f, %f, %f, %f, %f\n", px, py, pz, xtex, ytex);
+  //std::printf("%f, %f, %f, %f, %f\n", px, py, pz, xtex, ytex);
   vertices.push_back(px);
   vertices.push_back(py);
   vertices.push_back(pz);
@@ -176,7 +187,7 @@ void DrawableSection::add_triangle(
     unsigned char ind1,
     unsigned char ind2,
     unsigned char ind3) {
-  std::printf("%d, %d, %d\n", (int)ind1, (int)ind2, (int)ind3);  
+  //std::printf("%d, %d, %d\n", (int)ind1, (int)ind2, (int)ind3);  
   inds.push_back(ind1);
   inds.push_back(ind2);
   inds.push_back(ind3);
