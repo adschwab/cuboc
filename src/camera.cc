@@ -11,6 +11,7 @@
 
 #define PI 3.1415927f
 
+namespace cuboc {
 
 Camera::Camera(
     base::Window *window,
@@ -20,6 +21,7 @@ Camera::Camera(
     float sensitivity):
       _window(window),
       _pos(pos),
+      _section(XYZCoord()),
       _xy(xy_angle),
       _yz(yz_angle), 
       _root_forward(glm::vec3(0.0f, 0.0f, 1.0f)),
@@ -47,12 +49,13 @@ glm::mat4 Camera::getView() {
   return view;
 }
 
-glm::vec3 Camera::getPosition() {
-  return _pos;
+Position Camera::getPosition() {
+  return Position(_pos, _section);
 }
 
-void Camera::setPosition(glm::vec3 new_pos) {
-  _pos = new_pos;
+void Camera::setPosition(Position new_pos) {
+  _pos = new_pos.offset;
+  _section = new_pos.section;
   update_view();
 }
 
@@ -109,3 +112,4 @@ glm::quat Camera::rotation(glm::vec3 start, glm::vec3 dest) {
       rotationAxis.z * invs);
 }
 
+} // namespace

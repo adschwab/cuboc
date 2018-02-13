@@ -90,7 +90,7 @@ GLint ProgramLoader::load_shader(std::string file_name, GLenum shadertype, GLuin
 Program3d::Program3d(
     std::string v_glsl,
     std::string f_glsl,
-    Camera *camera) :
+    cuboc::Camera *camera) :
       ProgramLoader(v_glsl, f_glsl),
       _camera(camera) {
   this->use();

@@ -5,8 +5,20 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "window.h"
+#include "util/hashkey.h"
 
 #define DEFAULT_SENSITIVITY 5
+
+namespace cuboc {
+
+struct Position {
+
+  Position(glm::vec3 o, XYZCoord s) : offset(o), section(s) {}
+  
+  glm::vec3 offset;
+  XYZCoord section;
+
+};
 
 class Camera {
   
@@ -20,13 +32,13 @@ class Camera {
   
   glm::mat4 getProj();
   glm::mat4 getView();
-  glm::vec3 getPosition();
+  Position getPosition();
   
   float getXY();
 
   float getYZ();
   
-  void setPosition(glm::vec3 new_pos);
+  void setPosition(Position new_pos);
   
   void updateAngles(
       float xdiff,
@@ -41,9 +53,12 @@ class Camera {
   glm::mat4 view;
   glm::vec3 _root_forward;
   glm::vec3 _pos;
+  XYZCoord _section;
   float _xy;
   float _yz;
   float _sensitivity;
 };
+
+} // namespace
 
 #endif

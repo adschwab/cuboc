@@ -20,7 +20,7 @@ class DrawableSection {
   DrawableSection(
       BaseSection<Block> *section, float size);
 
-  void draw(glm::vec3 offset);
+  void draw();
   
   private:
   std::shared_ptr<glw::ArrayObject> ao_;

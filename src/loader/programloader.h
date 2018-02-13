@@ -37,12 +37,16 @@ class Program3d : public ProgramLoader {
   Program3d(
       std::string v_glsl,
       std::string f_glsl,
-      Camera *camera);
+      cuboc::Camera *camera);
 
   virtual void use();
 
+  cuboc::Camera *camera() {
+    return _camera;
+  }
+
   private:
-  Camera *_camera;
+  cuboc::Camera *_camera;
 
 };
 

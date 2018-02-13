@@ -1,9 +1,12 @@
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "camera.h"
+
+namespace cuboc {
 
 class Movement {
 
@@ -50,4 +53,5 @@ class Movement {
   float last_step;
 };
 
+} // namespace
 #endif

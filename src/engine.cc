@@ -35,8 +35,8 @@ bool mouse_set = false;
 glm::vec3 cam_pos = glm::vec3(0.0f, 1.5f, 0.0f);
 XYZCoord cam_ind = XYZCoord();
 
-Camera camera = Camera(&window, cam_pos, -3.0f * 3.14 / 4.0f, 0.0f);
-Movement movement = Movement(&camera);
+cuboc::Camera camera = cuboc::Camera(&window, cam_pos, -3.0f * 3.14 / 4.0f, 0.0f);
+cuboc::Movement movement = cuboc::Movement(&camera);
 
 static void err_callback(
     int error,
@@ -110,7 +110,7 @@ void initGL() {
           &camera));
 
   // ---------------- GENERATE RECTANGLE -----------------
-  world = new cuboc::World(programs[0].get(), tex_factory.get("grounds_atlas"));
+  world = new cuboc::World(static_cast<graphicsutils::Program3d *>(programs[0].get()), tex_factory.get("grounds_atlas"));
   //box = new Box(programs[0].get(), &tex_factory);
 }
 
@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    world->draw(cam_ind, glm::vec3());
+    world->draw();
     //box->draw(cam_pos);
     glUseProgram(0);
     

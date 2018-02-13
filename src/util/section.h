@@ -33,7 +33,7 @@ struct BaseSection {
 
   virtual bool isContiguous() { return true; }
 
-  size_t get_edge() { return edge; }
+  static size_t get_edge() { return edge; }
 };
 
 template<typename T, size_t edge = temp_utils::pow2<SECTION_SIZE>::value>

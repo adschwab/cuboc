@@ -1,5 +1,7 @@
 #include "glwrapper/buffer.h"
 
+#include <GL/glew.h>
+
 glw::VertexBuffer::VertexBuffer(
     std::vector<GLfloat> &data
   ) :

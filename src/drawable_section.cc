@@ -11,7 +11,7 @@ bool DrawableSection::static_init = false;
 float DrawableSection::tex_arr_x[TEX_WIDTH][4];
 float DrawableSection::tex_arr_y[TEX_WIDTH][4];
 
-void DrawableSection::draw(glm::vec3 offset) {
+void DrawableSection::draw() {
   ao_->draw();
 }
 
@@ -91,10 +91,9 @@ DrawableSection::DrawableSection(
         if (block.getType() == BLOCK_AIR) continue;
         short tex_row = block.getTexRow();
         
-        float i_f = (float) i / size;
-        float j_f = (float) j / size;
-        float k_f = (float) k / size;
-
+        float i_f = (float) i * size;
+        float j_f = (float) j * size;
+        float k_f = (float) k * size;
         if (k == 0 ||
             section->get(i, j, k - 1).getType() == BLOCK_AIR)
           add_face(

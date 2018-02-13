@@ -15,20 +15,22 @@
 #include "util/section.h"
 
 #define DEFAULT_RENDER_DIST 10
-#define BLOCK_SIZE 1.0f
+#define BLOCK_SIZE 0.5f
 namespace cuboc {
 
 class World {
 
   public:
   World(
-      graphicsutils::ProgramLoader *program,
+      graphicsutils::Program3d *program,
       TextureLoader *atlas);
 
-  void draw(XYZCoord coord_pos, glm::vec3 offset);
+  void draw();
+
+  static float section_edge;
 
   private:
-  graphicsutils::ProgramLoader *_program;
+  graphicsutils::Program3d *_program;
   TextureLoader *_tex_atlas;
 
   std::shared_ptr<util::Cache<XYZCoord, std::shared_ptr<BaseSection<Block> > > >

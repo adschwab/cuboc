@@ -4,7 +4,6 @@
 #include <vector>
 #include <memory>
 
-#include <GL/glew.h>
 
 namespace glw {
 
@@ -14,7 +13,7 @@ struct BufferAttr {
 
 class VertexBuffer {
   public:
-  VertexBuffer(std::vector<GLfloat> &data);
+  VertexBuffer(std::vector<float> &data);
   ~VertexBuffer();
 
   int size();
@@ -24,7 +23,7 @@ class VertexBuffer {
   void draw();
   
   private:
-  GLuint id;
+  unsigned int id;
 
   int _size;
 };
@@ -34,7 +33,7 @@ class IndexBuffer {
   IndexBuffer() {}
     
   IndexBuffer(
-      std::vector<GLubyte> &data);
+      std::vector<unsigned char> &data);
   ~IndexBuffer();
 
   int size();
@@ -44,7 +43,7 @@ class IndexBuffer {
   void draw();
 
   private:
-  GLuint id;
+  unsigned int id;
 
   int _size;
 };
@@ -66,7 +65,7 @@ class ArrayObject {
 
   private:
   bool _has_indices;
-  GLuint id;
+  unsigned int id;
 
   void setup(std::vector<BufferAttr> &attrs);
 
