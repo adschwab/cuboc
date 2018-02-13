@@ -35,7 +35,7 @@ bool mouse_set = false;
 glm::vec3 cam_pos = glm::vec3(0.0f, 1.5f, 0.0f);
 XYZCoord cam_ind = XYZCoord();
 
-cuboc::Camera camera = cuboc::Camera(&window, cam_pos, -3.0f * 3.14 / 4.0f, 0.0f);
+cuboc::Camera camera = cuboc::Camera(&window, cam_pos, 3.14f/2.0f, 0.0f);
 cuboc::Movement movement = cuboc::Movement(&camera);
 
 static void err_callback(

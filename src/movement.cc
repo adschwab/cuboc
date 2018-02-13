@@ -37,22 +37,22 @@ void Movement::updatePosition() {
   
   cuboc::Position pos = cam->getPosition();
   if (left > 0.01f) {
-    pos.offset[2] -= speed * diff * left * glm::sin(cam->getXY());
-    pos.offset[0] += speed * diff * left * glm::cos(cam->getXY());
+    pos.offset[2] += speed * diff * left * glm::sin(cam->getXY());
+    pos.offset[0] -= speed * diff * left * glm::cos(cam->getXY());
   }
   if (right > 0.01f) {
-    pos.offset[2] += speed * diff * right * glm::sin(cam->getXY());
-    pos.offset[0] -= speed * diff * right * glm::cos(cam->getXY());
+    pos.offset[2] -= speed * diff * right * glm::sin(cam->getXY());
+    pos.offset[0] += speed * diff * right * glm::cos(cam->getXY());
   }
   if (forward > 0.01f) {
-    pos.offset[2] += speed * diff * forward * glm::cos(cam->getXY());
-    pos.offset[0] += speed * diff * forward * glm::sin(cam->getXY());
+    pos.offset[2] -= speed * diff * forward * glm::cos(cam->getXY());
+    pos.offset[0] -= speed * diff * forward * glm::sin(cam->getXY());
   }
   if (backward > 0.01f) {
-    pos.offset[2] -= speed * diff * backward * glm::cos(cam->getXY());
-    pos.offset[0] -= speed * diff * backward * glm::sin(cam->getXY());
+    pos.offset[2] += speed * diff * backward * glm::cos(cam->getXY());
+    pos.offset[0] += speed * diff * backward * glm::sin(cam->getXY());
   }
-  cam->setPosition(pos);
+
   if (pos.offset[0] > World::section_edge) {
     pos.offset[0] -= World::section_edge;
     pos.section.setX(pos.section.x() + 1);
@@ -77,6 +77,8 @@ void Movement::updatePosition() {
     pos.offset[2] += World::section_edge;
     pos.section.setY(pos.section.y() - 1);
   }
+  //std::printf("%d,%d,%d\n", pos.section.x(), pos.section.y(), pos.section.z());
+  cam->setPosition(pos);
 }
 
 } // namespace

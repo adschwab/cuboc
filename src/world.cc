@@ -52,22 +52,26 @@ void World::draw() {
   _program->use();
   _tex_atlas->set(_program);
   for (int i = 0; i < 2; i ++) {
-    XYZCoord coord = coord_pos;
-    coord.setX(coord_pos.x() + i);
-    DrawableSection drawable = _draw_cache->get(coord);
+    for (int j = 0; j < 2; j ++) {
+      for (int k = 0; k < 2; k ++) {
+        XYZCoord coord(i, j, k);
+        if (!_draw_cache->contains(coord)) continue;
+        DrawableSection drawable = _draw_cache->get(coord);
 
-    float x_off = (coord_pos.x() - coord.x()) * 
-        World::section_edge;
-    float y_off = (coord_pos.y() - coord.y()) *
-        World::section_edge;
-    float z_off = (coord_pos.z() - coord.z()) *
-        World::section_edge;
-    glm::vec3 block_offset(x_off, z_off, y_off);
-    glm::mat4 model;
-    model = glm::translate(model, -block_offset);
-    _program->setMatrix("model", model);
+        float x_off = (coord_pos.x() - coord.x()) * 
+            World::section_edge;
+        float y_off = (coord_pos.y() - coord.y()) *
+            World::section_edge;
+        float z_off = (coord_pos.z() - coord.z()) *
+            World::section_edge;
+        glm::vec3 block_offset(x_off, z_off, y_off);
+        glm::mat4 model;
+        model = glm::translate(model, -block_offset);
+        _program->setMatrix("model", model);
   
-    drawable.draw();
+        drawable.draw();
+      }
+    }
   }
 }
 

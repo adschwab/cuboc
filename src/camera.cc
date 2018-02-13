@@ -73,13 +73,13 @@ void Camera::updateAngles(
 
 void Camera::update_view() {
   view = glm::mat4();
-  glm::vec3 pos = _pos;
-  pos[1] = -pos[1];
+  glm::vec3 pos = -_pos;
+  //pos[1] = -pos[1];
   view = glm::translate(view, pos);
   float xang = glm::sin(-_xy);
   float yang = glm::cos(-_xy);
   glm::vec3 angle = glm::vec3(xang, 0.0f, yang);
-  view = glm::toMat4(rotation(_root_forward, angle)) * view;
+  view = glm::toMat4(rotation(_root_forward, -angle)) * view;
 
   yang = glm::cos(_yz);
   float zang = glm::sin(_yz);
