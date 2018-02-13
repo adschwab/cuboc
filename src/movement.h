@@ -17,7 +17,7 @@ class Movement {
       _right(false),
       _forward(false),
       _backward(false),
-      speed(1.0f){
+      speed(2.0f){
     
     last_step = glfwGetTime();
   }  

@@ -37,20 +37,20 @@ void Movement::updatePosition() {
   
   cuboc::Position pos = cam->getPosition();
   if (left > 0.01f) {
-    pos.offset[2] += speed * diff * left * glm::sin(cam->getXY());
-    pos.offset[0] -= speed * diff * left * glm::cos(cam->getXY());
+    pos.offset[2] -= speed * diff * left * glm::sin(cam->getXY());
+    pos.offset[0] += speed * diff * left * glm::cos(cam->getXY());
   }
   if (right > 0.01f) {
-    pos.offset[2] -= speed * diff * right * glm::sin(cam->getXY());
-    pos.offset[0] += speed * diff * right * glm::cos(cam->getXY());
+    pos.offset[2] += speed * diff * right * glm::sin(cam->getXY());
+    pos.offset[0] -= speed * diff * right * glm::cos(cam->getXY());
   }
   if (forward > 0.01f) {
-    pos.offset[2] -= speed * diff * forward * glm::cos(cam->getXY());
-    pos.offset[0] -= speed * diff * forward * glm::sin(cam->getXY());
+    pos.offset[2] += speed * diff * forward * glm::cos(cam->getXY());
+    pos.offset[0] += speed * diff * forward * glm::sin(cam->getXY());
   }
   if (backward > 0.01f) {
-    pos.offset[2] += speed * diff * backward * glm::cos(cam->getXY());
-    pos.offset[0] += speed * diff * backward * glm::sin(cam->getXY());
+    pos.offset[2] -= speed * diff * backward * glm::cos(cam->getXY());
+    pos.offset[0] -= speed * diff * backward * glm::sin(cam->getXY());
   }
 
   if (pos.offset[0] > World::section_edge) {

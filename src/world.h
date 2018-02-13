@@ -14,7 +14,7 @@
 #include "util/cache.h"
 #include "util/section.h"
 
-#define DEFAULT_RENDER_DIST 10
+#define DEFAULT_RENDER_DIST 5
 #define BLOCK_SIZE 0.5f
 namespace cuboc {
 
@@ -23,7 +23,8 @@ class World {
   public:
   World(
       graphicsutils::Program3d *program,
-      TextureLoader *atlas);
+      TextureLoader *atlas,
+      unsigned char render_dist=DEFAULT_RENDER_DIST);
 
   void draw();
 
@@ -32,6 +33,7 @@ class World {
   private:
   graphicsutils::Program3d *_program;
   TextureLoader *_tex_atlas;
+  unsigned char _render_dist;
 
   std::shared_ptr<util::Cache<XYZCoord, std::shared_ptr<BaseSection<Block> > > >
       _raw;

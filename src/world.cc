@@ -11,9 +11,11 @@ float World::section_edge = (float) BaseSection<int>::get_edge() * BLOCK_SIZE;
 
 World::World(
     graphicsutils::Program3d *program,
-    TextureLoader *atlas) :
+    TextureLoader *atlas,
+    unsigned char render_dist) :
     _program(program),
-    _tex_atlas(atlas) {
+    _tex_atlas(atlas),
+    _render_dist(render_dist) {
 
   _raw = std::make_shared<util::Cache<XYZCoord, std::shared_ptr<BaseSection<Block> > > >();
   _draw_cache = std::make_shared<util::Cache<XYZCoord, DrawableSection > > ();
@@ -51,10 +53,13 @@ void World::draw() {
   XYZCoord coord_pos = pos.section;
   _program->use();
   _tex_atlas->set(_program);
-  for (int i = 0; i < 2; i ++) {
-    for (int j = 0; j < 2; j ++) {
-      for (int k = 0; k < 2; k ++) {
-        XYZCoord coord(i, j, k);
+  for (int i = -_render_dist; i < _render_dist + 1; i ++) {
+    for (int j = -_render_dist; j < _render_dist + 1; j ++) {
+      for (int k = -_render_dist; k < _render_dist + 1; k ++) {
+        XYZCoord coord(
+            coord_pos.x() + i,
+            coord_pos.y() + j,
+            coord_pos.z() + k);
         if (!_draw_cache->contains(coord)) continue;
         DrawableSection drawable = _draw_cache->get(coord);
 
