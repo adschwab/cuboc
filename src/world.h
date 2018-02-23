@@ -9,6 +9,7 @@
 #include "loader/texture_loader.h"
 #include "block.h"
 #include "drawable_section.h"
+#include "camera.h"
 
 #include "util/hashkey.h"
 #include "util/cache.h"
@@ -24,16 +25,24 @@ class World {
   World(
       graphicsutils::Program3d *program,
       TextureLoader *atlas,
+      Camera *camera,
       unsigned char render_dist=DEFAULT_RENDER_DIST);
 
   void draw();
 
+  static float block_size;
   static float section_edge;
+  static int section_count;
+  static int getSubIndex(float offset);
+  static float getSubOffset(int index);
+
+  util::Store<XYZCoord, std::shared_ptr<BaseSection<Block> > > *get_raw();
 
   private:
   graphicsutils::Program3d *_program;
   TextureLoader *_tex_atlas;
   unsigned char _render_dist;
+  Camera *_camera;
 
   std::shared_ptr<util::Cache<XYZCoord, std::shared_ptr<BaseSection<Block> > > >
       _raw;

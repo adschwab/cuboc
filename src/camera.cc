@@ -8,6 +8,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "window.h"
+#include "util/macro.h"
 
 #define PI 3.1415927f
 
@@ -18,14 +19,18 @@ Camera::Camera(
     glm::vec3 pos, 
     float xy_angle,
     float yz_angle,
-    float sensitivity):
+    float sensitivity,
+    float cam_close,
+    float width_ang):
       _window(window),
       _pos(pos),
       _section(XYZCoord()),
       _xy(xy_angle),
       _yz(yz_angle), 
       _root_forward(glm::vec3(0.0f, 0.0f, 1.0f)),
-      _sensitivity(sensitivity) {
+      _sensitivity(sensitivity),
+      _cam_close(cam_close),
+      _width_ang(width_ang) {
   update_view();
 }
 
@@ -39,9 +44,9 @@ float Camera::getYZ() {
 
 glm::mat4 Camera::getProj() {
   return glm::perspective(
-      glm::radians(45.0f),
+      _width_ang,
       (float)_window->getWidth()/(float)_window->getHeight(),
-      0.1f,
+      _cam_close,
       100.0f); 
 }
 
@@ -50,12 +55,16 @@ glm::mat4 Camera::getView() {
 }
 
 Position Camera::getPosition() {
+  std::lock_guard<std::mutex> lk(_mtx);
   return Position(_pos, _section);
 }
 
 void Camera::setPosition(Position new_pos) {
-  _pos = new_pos.offset;
-  _section = new_pos.section;
+  {
+    std::lock_guard<std::mutex> lk(_mtx);
+    _pos = new_pos.offset;
+    _section = new_pos.section;
+  }
   update_view();
 }
 
@@ -110,6 +119,35 @@ glm::quat Camera::rotation(glm::vec3 start, glm::vec3 dest) {
       rotationAxis.x * invs,
       rotationAxis.y * invs,
       rotationAxis.z * invs);
+}
+
+void Camera::updateCache() {
+  if (win_width == _window->getWidth() &&
+      win_height == _window->getHeight()) {
+    return;
+  }
+  win_width = _window->getWidth();
+  win_height = _window->getHeight();
+  _cam_width = _cam_close * std::tan(_width_ang/2.0f);
+  float alpha = (float) win_width / (float) win_height;
+  _cam_height = _cam_width * alpha;
+  float h = std::sqrt(SQUARE(_cam_width) + SQUARE(_cam_height));
+  _max_dist = std::sqrt(SQUARE(h) + SQUARE(_cam_close));
+}
+
+float Camera::getMaxDist() {
+  updateCache();
+  return _max_dist;
+}
+
+float Camera::widthOver2() {
+  updateCache();
+  return _cam_width;
+}
+
+float Camera::heightOver2() {
+  updateCache();
+  return _cam_height;
 }
 
 } // namespace

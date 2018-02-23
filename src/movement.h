@@ -5,22 +5,16 @@
 #include <GLFW/glfw3.h>
 
 #include "camera.h"
+#include "block.h"
+#include "util/store.h"
+#include "util/section.h"
 
 namespace cuboc {
 
 class Movement {
 
   public:
-  Movement(Camera *camera):
-      cam(camera),
-      _left(false),
-      _right(false),
-      _forward(false),
-      _backward(false),
-      speed(2.0f){
-    
-    last_step = glfwGetTime();
-  }  
+  Movement(Camera *camera);
 
   void setLeft(bool left) {
     _left = left;
@@ -38,10 +32,15 @@ class Movement {
     _backward = backward;
   }
   
-  void updatePosition(); 
+  void updatePosition(util::Store<XYZCoord, std::shared_ptr<BaseSection<Block> > > *world);
 
   private:
-
+  void check(
+      XYZCoord section,
+      glm::vec3 offset,
+      float &xdiff, float &ydiff,
+      util::Store<XYZCoord, std::shared_ptr<BaseSection<Block> > > *world);
+  
   Camera *cam;
   float speed;
   

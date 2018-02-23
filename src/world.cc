@@ -5,20 +5,36 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "util/macro.h"
+#include "util/log.h"
+
 namespace cuboc {
 
+float World::block_size = BLOCK_SIZE;
 float World::section_edge = (float) BaseSection<int>::get_edge() * BLOCK_SIZE;
+int World::section_count = BaseSection<int>::get_edge();
+
+int World::getSubIndex(float offset) {
+  return (int)(offset * World::block_size * World::section_count);
+}
+
+float World::getSubOffset(int index) {
+  return (float) index / World::section_edge;
+}
+
 
 World::World(
     graphicsutils::Program3d *program,
     TextureLoader *atlas,
+    Camera *camera,
     unsigned char render_dist) :
     _program(program),
     _tex_atlas(atlas),
+    _camera(camera),
     _render_dist(render_dist) {
-
+  
   _raw = std::make_shared<util::Cache<XYZCoord, std::shared_ptr<BaseSection<Block> > > >();
-  _draw_cache = std::make_shared<util::Cache<XYZCoord, DrawableSection > > ();
+  _draw_cache = std::make_shared<util::Cache<XYZCoord, DrawableSection > > (CUBE(DEFAULT_RENDER_DIST * 2 + 1) * 2 + 1);
 
   std::shared_ptr<Section<Block> > test_section = std::make_shared<Section<Block> > ();
   test_section->set(Block(BLOCK_BOX), 0, 0, 0);
@@ -60,9 +76,8 @@ void World::draw() {
             coord_pos.x() + i,
             coord_pos.y() + j,
             coord_pos.z() + k);
-        if (!_draw_cache->contains(coord)) continue;
-        DrawableSection drawable = _draw_cache->get(coord);
-
+        DrawableSection *drawable = _draw_cache->get(coord);
+        if (drawable == nullptr) continue;
         float x_off = (coord_pos.x() - coord.x()) * 
             World::section_edge;
         float y_off = (coord_pos.y() - coord.y()) *
@@ -74,10 +89,14 @@ void World::draw() {
         model = glm::translate(model, -block_offset);
         _program->setMatrix("model", model);
   
-        drawable.draw();
+        drawable->draw();
       }
     }
   }
+}
+
+util::Store<XYZCoord, std::shared_ptr<BaseSection<Block> > > *World::get_raw() {
+  return _raw.get();
 }
 
 } // namespace cuboc

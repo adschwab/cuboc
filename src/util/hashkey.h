@@ -2,6 +2,7 @@
 #define HASHKEY_H
 
 #include <functional>
+#include <string>
 
 #include <glm/glm.hpp>
 
@@ -117,6 +118,12 @@ struct XYZCoord {
   
   void setZ(int z) {
     coords[2] = z;
+  }
+
+  operator std::string() {
+    char msg[50];
+    std::snprintf(msg, 50, "%d, %d, %d", coords[0], coords[1], coords[2]);
+    return std::string(msg);
   }
 
   bool operator==(const XYZCoord &other) const{

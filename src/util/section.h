@@ -29,7 +29,9 @@ struct BaseSection {
     return T();
   }
 
-  virtual void set(T item, int x, int y, int z) = 0;
+  virtual void set(T item, int x, int y, int z) {
+    assert(false);
+  }
 
   virtual bool isContiguous() { return true; }
 

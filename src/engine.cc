@@ -13,7 +13,6 @@
 #include "loader/programloader.h"
 #include "loader/texture_loader.h"
 #include "world.h"
-#include "objects/box.h"
 #include "util/hashkey.h"
 
 int target_fps = 30;
@@ -23,20 +22,19 @@ std::vector<std::shared_ptr<graphicsutils::ProgramLoader> >
     programs;
 
 cuboc::World *world;
-Box *box = NULL;
 
-base::Window window = base::Window(1000, 600, "Window Fun");
+base::Window window(1000, 600, "Window Fun");
 TextureFactory tex_factory("textures");
 
 double mouseX = window.getWidth()/2;
 double mouseY = window.getHeight()/2;
 bool mouse_set = false;
 
-glm::vec3 cam_pos = glm::vec3(0.0f, 1.5f, 0.0f);
-XYZCoord cam_ind = XYZCoord();
+glm::vec3 cam_pos = glm::vec3(0.0f, 0.5f, 0.0f);
+XYZCoord cam_ind();
 
-cuboc::Camera camera = cuboc::Camera(&window, cam_pos, 3.14f/2.0f, 0.0f);
-cuboc::Movement movement = cuboc::Movement(&camera);
+cuboc::Camera camera(&window, cam_pos, 3.14f/2.0f, 0.0f);
+cuboc::Movement movement(&camera);
 
 static void err_callback(
     int error,
@@ -110,7 +108,7 @@ void initGL() {
           &camera));
 
   // ---------------- GENERATE RECTANGLE -----------------
-  world = new cuboc::World(static_cast<graphicsutils::Program3d *>(programs[0].get()), tex_factory.get("grounds_atlas"));
+  world = new cuboc::World(static_cast<graphicsutils::Program3d *>(programs[0].get()), tex_factory.get("grounds_atlas"), &camera);
   //box = new Box(programs[0].get(), &tex_factory);
 }
 
@@ -128,12 +126,11 @@ int main(int argc, char** argv) {
 
   std::printf("Running\n");
   while (window.run()) {
-    movement.updatePosition();
+    movement.updatePosition(world->get_raw());
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     world->draw();
-    //box->draw(cam_pos);
     glUseProgram(0);
     
     GLfloat time = glfwGetTime();

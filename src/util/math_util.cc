@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #define PI 3.141593f
+
 void walkLine(
     const glm::vec3 &pos,
     const glm::vec3 &dir, // This is assumed to be normalized
