@@ -16,15 +16,15 @@ namespace cuboc {
 
 Camera::Camera(
     base::Window *window,
-    glm::vec3 pos, 
+    glm::vec3 pos_init, 
     float xy_angle,
     float yz_angle,
     float sensitivity,
     float cam_close,
     float width_ang):
       _window(window),
-      _pos(pos),
-      _section(XYZCoord()),
+      _pos(pos_init),
+      _section(XYZCoord(0, 0, 0)),
       _xy(xy_angle),
       _yz(yz_angle), 
       _root_forward(glm::vec3(0.0f, 0.0f, 1.0f)),

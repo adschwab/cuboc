@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <string>
+#include <climits>
 
 #include <glm/glm.hpp>
 
@@ -85,9 +86,9 @@ struct XYZCoord {
   int coords[3];
 
   XYZCoord() {
-    this->setX(0);
-    this->setY(0);
-    this->setZ(0);
+    this->setX(INT_MAX);
+    this->setY(INT_MAX);
+    this->setZ(INT_MAX);
   }
 
   XYZCoord(int x_, int y_, int z_) {

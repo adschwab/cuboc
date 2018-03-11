@@ -9,7 +9,10 @@
 #include "world.h"
 #include "util/macro.h"
 #include "util/section_util.h"
+#include "util/math_util.h"
 #include "util/log.h"
+
+#define MIN_DIST 0.0001f
 
 namespace cuboc {
 
@@ -29,6 +32,7 @@ void Movement::updatePosition(util::Store<XYZCoord, std::shared_ptr<BaseSection<
   float diff = time - last_step;
   last_step = time;
 
+  if (!(_left || _right || _forward || _backward)) return;
   float left =_left;
   float right = _right;
   float forward = _forward;
@@ -63,9 +67,6 @@ void Movement::updatePosition(util::Store<XYZCoord, std::shared_ptr<BaseSection<
     xdiff += -speed * diff * backward * glm::sin(cam->getXY());
   }
 
-  //int curr_x = (int)(pos.offset[0] * World::section_count);
-  //int curr_y = (int)(pos.offset[2] * World::section_count);
-
   check(
       pos.section,
       pos.offset,
@@ -74,8 +75,6 @@ void Movement::updatePosition(util::Store<XYZCoord, std::shared_ptr<BaseSection<
       world);
 
 
-  //LOGF("%d, %d", (int)(pos.offset[0] * World::section_count), (int)(pos.offset[2] * World::section_count));
-  
   float new_x = pos.offset[0] + xdiff;
   float new_y = pos.offset[2] + ydiff;
 
@@ -112,44 +111,79 @@ void Movement::updatePosition(util::Store<XYZCoord, std::shared_ptr<BaseSection<
 
 void Movement::check(
     XYZCoord section,
-    glm::vec3 offset,
+    glm::vec3 raw_pos,
     float &xdiff, float &ydiff,
     util::Store<XYZCoord, std::shared_ptr<BaseSection<Block> > > *store) {
  
   Block block;
-  float max_dist = cam->getMaxDist();
+  glm::vec3 pos(
+      raw_pos[0],
+      raw_pos[2],
+      raw_pos[1]);
+  glm::vec3 dir = calcDirXY(xdiff, ydiff);
+  
 
-  int x_ind = World::getSubIndex(offset[0]);
-  int y_ind = World::getSubIndex(offset[2]);
-  int z_ind = World::getSubIndex(offset[1]);
-  if (xdiff > 0.0f) {
-    for (int i = World::getSubIndex(offset[0] + max_dist); i <= World::getSubIndex(offset[0] + xdiff + max_dist); i ++) {
-      bool exists = cuboc::get_block(
-          store,
-          section,
-          World::section_count,
-          i, y_ind, z_ind,
-          block);
-      if (exists && block.getType() != 0) {
-        xdiff = -offset[0] + World::getSubOffset(i) - max_dist;
-        break;
+
+  std::vector<std::array<int, 3> > offsets;
+  float dist = std::sqrt(SQUARE(xdiff) + SQUARE(ydiff));
+  walkLine(pos, dir, dist, World::block_size, offsets);
+  //LOGF("x: %.2f, y: %.2f -> (%.2f, %.2f, %.2f)", xdiff, ydiff, dir[0], dir[1], dir[2]);
+  
+  for (int i = 0; i < offsets.size(); i ++) {
+    std::array<int, 3> offset = offsets[i];
+
+    bool found = get_block(
+        store,
+        section,
+        World::section_count,
+        offset,
+        block);
+    if (found && block.getType() != BLOCK_AIR) {
+
+      float xnear = World::getSubOffset(offset[0]);
+      float ynear = World::getSubOffset(offset[1]);
+      if (std::abs(xnear - pos[0]) < MIN_DIST && xdiff > 0.0f) {
+        xdiff = 0.0f;
+        return;
       }
+      else if (std::abs(xnear + World::block_size - pos[0]) < MIN_DIST && xdiff < 0.0f) {
+        xdiff = 0.0f;
+        return;
+      }
+      if (std::abs(ynear - pos[1]) < MIN_DIST && ydiff > 0.0f) {
+        ydiff = 0.0f;
+        return;
+      }
+      else if (std::abs(ynear + World::block_size - pos[1]) < MIN_DIST && ydiff < 0.0f) {
+        ydiff = 0.0f;
+        return;
+      }
+      float distf = MAX_DIST;
+
+      if (xdiff > 0.0f) {
+        distf = std::min(distf, distPlane(true, 0, xnear, pos, dir));
+      }
+      else if (xdiff < 0.0f) {
+        distf = std::min(distf, distPlane(false, 0, xnear + World::block_size, pos, dir));
+
+      }
+      if (ydiff > 0.0f) {
+        distf = std::min(distf, distPlane(true, 1, ynear, pos, dir));
+      }
+      else if (ydiff < 0.0f) {
+        distf = std::min(distf, distPlane(false, 1, ynear + World::block_size, pos, dir));
+      }
+
+      LOGF("([%d, %d] - [%.2f, %.2f]) -> %.2f, %.2f: %.2f", section.x(), section.y(),  pos[0], pos[1], xdiff, ydiff, distf);
+      
+      xdiff = distf * xdiff / dist;
+      ydiff = distf * ydiff / dist;
+
+      
+      break;
     }
   }
-  if (ydiff > 0.0f) {
-    for (int i = World::getSubIndex(offset[2] + max_dist); i <= World::getSubIndex(offset[2] + ydiff + max_dist); i ++) {
-      bool exists = cuboc::get_block(
-          store,
-          section,
-          World::section_count,
-          x_ind, i, z_ind,
-          block);
-      if (exists && block.getType() != 0) {
-        ydiff = -offset[2] + World::getSubOffset(i) - max_dist;
-        break;
-      }
-    }
-  }
+
 }
 
 } // namespace

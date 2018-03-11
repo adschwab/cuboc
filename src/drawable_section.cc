@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <vector>
 
+#include "util/log.h"
 #include "glwrapper/buffer.h"
 
 namespace cuboc {

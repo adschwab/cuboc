@@ -3,7 +3,7 @@
 
 #include <cstdio>
 
-#define LOG(msg) std::printf("%s:%d msg\n", __FILE__, __LINE__);
+#define LOG(msg) std::printf("%s:%d " msg "\n", __FILE__, __LINE__);
 
 #define LOGF(msg, ...) std::printf("%s:%d " msg "\n", __FILE__, __LINE__, __VA_ARGS__);
 

@@ -21,10 +21,11 @@ class DrawableSection {
       BaseSection<Block> *section, float size);
 
   void draw();
-  
+ 
+  bool isInit() { return (bool) ao_; }
+
   private:
   std::shared_ptr<glw::ArrayObject> ao_;
-
 
   // Statics
   static float tex_arr_x[TEX_WIDTH][4];

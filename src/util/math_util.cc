@@ -2,21 +2,40 @@
 
 #include <cstdio>
 #include <cmath>
+#include <vector>
+#include <array>
+#include <limits>
+#include <cfloat>
 
 #include <glm/glm.hpp>
 
+#include "util/macro.h"
+
 #define PI 3.141593f
 
-void walkLine(
-    const glm::vec3 &pos,
-    const glm::vec3 &dir, // This is assumed to be normalized
+namespace cuboc {
+
+void calcDiffs(
+    glm::vec3 dir,
     float dist,
-    bool visit(int, int, int)) {
+    glm::vec3 &diffs) {
 
-  float gx0 = pos[0];
-  float gy0 = pos[1];
-  float gz0 = pos[2];
+  diffs[0] = dir[0] * dist;
+  diffs[1] = dir[1] * dist;
+  diffs[2] = dir[2] * dist;
+}  
+  
+void walkLine(
+    const glm::vec3 pos,
+    const glm::vec3 dir, // This is assumed to be normalized
+    float dist, float size,
+    std::vector<std::array<int, 3> > &offsets) {
+  dist = dist / size;
 
+  float gx0 = pos[0] / size;
+  float gy0 = pos[1] / size;
+  float gz0 = pos[2] / size;
+  
   float dx = dir[0];
   float dy = dir[1];
   float dz = dir[2];
@@ -66,8 +85,7 @@ void walkLine(
   float derrz = (float)sz * vxvy;
 
   while (true) {
-    if (!visit(gx, gy, gz)) break;
-
+    offsets.push_back({gx, gy, gz});
     if (gx == gx1idx && gy == gy1idx && gz == gz1idx) break;
 
     //Which plane do we cross first?
@@ -91,12 +109,130 @@ void walkLine(
   }
 }
 
+
+float distPlane(
+    bool is_positive,
+    char dim_ind,
+    float plane,
+    glm::vec3 pos,
+    glm::vec3 dir) {
+  
+  float diffs[3];
+  float sign_mult = is_positive ? 1.0f : -1.0f;
+  if (dir[dim_ind] == 0.0f)
+    return std::numeric_limits<float>::infinity();
+  float p = (plane - pos[dim_ind])/dir[dim_ind];
+  sign_mult *= (p > 0.0f ? 1.0f : -1.0f);
+  diffs[dim_ind] = p * dir[dim_ind] + pos[dim_ind];
+  for (int i = 0; i < 3; i ++) {
+    if (i != dim_ind) {
+      diffs[i] = p * dir[i] + pos[i];
+    }
+  }
+
+  return sign_mult * std::sqrt(
+      SQUARE(diffs[0] - pos[0]) + 
+      SQUARE(diffs[1] - pos[1]) + 
+      SQUARE(diffs[2] - pos[2]));
+}
+
 glm::vec3 calcDir(float xy, float yz) {
   float x = std::sin(xy) * std::cos(yz);
   float y = std::cos(xy) * std::cos(yz);
   float z = std::sin(yz);
 
   return glm::vec3(x, y, z);
+}
+
+glm::vec3 calcDirXY(float xoff, float yoff) {
+  if (yoff == 0.0f) return calcDir(PI/2.0f, 0.0f);
+  float xy = std::atan(xoff / yoff);
+  return calcDir(xy, 0.0f);
+}
+
+glm::vec3 crossProduct(glm::vec3 p1, glm::vec3 p2) {
+  glm::vec3 cp;
+  cp[0] = p1[1] * p2[2] - p1[2] * p2[1];
+  cp[1] = p1[0] * p2[2] - p1[2] * p2[0];
+  cp[2] = p1[0] * p2[1] - p1[1] * p2[0];
+  return cp;
+}
+
+glm::vec3 solve(glm::mat3 m, glm::vec3 b) {
+  glm::mat3 l;
+  glm::mat3 u;
+
+  std::array<int, 3> o = {0, 1, 2};
+  for (int i = 0; i < 3; i++) {
+    float max = std::abs(m[o[i]][i]);
+    int max_ind = i;
+    for (int j = i + 1; j < 3; j ++) {
+      if (std::abs(m[o[j]][i]) > max) {
+        max = std::abs(m[o[j]][i]);
+        max_ind = j;
+      }
+    }
+    int tmp = o[i];
+    o[i] = o[max_ind];
+    o[max_ind] = tmp;
+    
+    for (int k = i; k < 3; k++) {
+      int sum = 0.0f;
+      for (int j = 0; j < i; j++)
+        sum += (l[i][j] * u[j][k]);
+      u[i][k] = m[o[i]][k] - sum;
+    }
+    for (int k = i; k < 3; k++) {
+      if (i == k)
+        l[i][i] = 1.0f; // Diagonal as 1
+      else {
+        int sum = 0.0f;
+        for (int j = 0; j < i; j++)
+          sum += (l[k][j] * u[j][i]);
+        l[k][i] = (m[o[k]][i] - sum) / u[i][i];
+      }
+    }
+  }
+
+  /*
+  std::printf("l:\n");
+  std::printf("%.2f,%.2f,%.2f\n", l[0][0], l[0][1], l[0][2]);
+  std::printf("%.2f,%.2f,%.2f\n", l[1][0], l[1][1], l[1][2]);
+  std::printf("%.2f,%.2f,%.2f\n", l[2][0], l[2][1], l[2][2]);
+  std::printf("u:\n");
+  std::printf("%.2f,%.2f,%.2f\n", u[0][0], u[0][1], u[0][2]);
+  std::printf("%.2f,%.2f,%.2f\n", u[1][0], u[1][1], u[1][2]);
+  std::printf("%.2f,%.2f,%.2f\n", u[2][0], u[2][1], u[2][2]);
+  */
+
+  glm::vec3 y;
+  for(int i = 0; i < 3; i++){
+    float s = 0.0f;
+    for(int j = 0; j < i; j++){
+      s = s + l[i][j] * y[j];
+    }
+    if (l[i][i] == 0.0f)
+      l[i][i] = FLT_MIN;
+    y[i] = (b[o[i]] - s) / l[i][i];
+  }
+  
+  glm::vec3 x; 
+  for(int i = 2; i >= 0; i--){
+    float s = 0.0f;
+    for(int j = 2; j > i; j--){
+      s = s + u[i][j] * x[j];
+    }
+    if (u[i][i] == 0.0f)
+      u[i][i] = FLT_MIN;
+    x[i] = (y[i] - s) / u[i][i];
+  }
+  
+  return x;
+}
+
+float norm(glm::vec3 pt1, glm::vec3 pt2) {
+
+  return std::sqrt(SQUARE(pt2[0] - pt1[0]) + SQUARE(pt2[1] - pt1[1]) + SQUARE(pt2[2] - pt1[2]));
 }
 
 inline bool findBounds(int p1, int p2,
@@ -135,4 +271,4 @@ bool findBounds(int x1, int x2,
   return findBounds(z1, z2, cz, size, bz1, bz2);
 }
 
-
+} // namespace

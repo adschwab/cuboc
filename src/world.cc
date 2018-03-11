@@ -46,10 +46,11 @@ World::World(
   test_section->set(Block(BLOCK_BOX), 0, 1, 1);
   test_section->set(Block(BLOCK_BOX), 1, 1, 1);
 
-  _raw->add(XYZCoord(), test_section);
+  _raw->add(XYZCoord(1, 1, 0), test_section);
   DrawableSection drawable(test_section.get(), BLOCK_SIZE);
-  _draw_cache->add(XYZCoord(), drawable);
+  _draw_cache->add(XYZCoord(1, 1, 0), drawable);
   
+  /*
   std::shared_ptr<Section<Block> > test_section2 = std::make_shared<Section<Block> > ();
   test_section2->set(Block(BLOCK_EARTH), 0, 0, 0);
   test_section2->set(Block(BLOCK_EARTH), 0, 0, 1);
@@ -62,6 +63,7 @@ World::World(
   _raw->add(XYZCoord(1, 0, 0), test_section2);
   DrawableSection drawable2(test_section2.get(), BLOCK_SIZE);
   _draw_cache->add(XYZCoord(1, 0, 0), drawable2);
+  */
 }
 
 void World::draw() {
@@ -88,7 +90,6 @@ void World::draw() {
         glm::mat4 model;
         model = glm::translate(model, -block_offset);
         _program->setMatrix("model", model);
-  
         drawable->draw();
       }
     }

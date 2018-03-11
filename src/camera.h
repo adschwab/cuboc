@@ -9,6 +9,7 @@
 #include "window.h"
 #include "util/hashkey.h"
 
+// fundamental camera stats - assume cam_close << block_size
 #define DEFAULT_SENSITIVITY 5
 #define DEFAULT_CAM_CLOSE 0.1f
 #define DEFAULT_WIDTH_ANG glm::radians(45.0f)
@@ -29,7 +30,7 @@ class Camera {
   public:
   Camera(
       base::Window *window,
-      glm::vec3 pos,
+      glm::vec3 pos_init,
       float xy_angle,
       float yz_angle,
       float sensitivity=DEFAULT_SENSITIVITY,

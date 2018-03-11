@@ -9,6 +9,7 @@
 #include "util/store.h"
 #include "util/section.h"
 
+#define MAX_DIST 5.0f
 namespace cuboc {
 
 class Movement {
@@ -37,7 +38,7 @@ class Movement {
   private:
   void check(
       XYZCoord section,
-      glm::vec3 offset,
+      glm::vec3 raw_pos, // <x, z, y>
       float &xdiff, float &ydiff,
       util::Store<XYZCoord, std::shared_ptr<BaseSection<Block> > > *world);
   
