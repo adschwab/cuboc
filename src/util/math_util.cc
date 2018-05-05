@@ -11,8 +11,6 @@
 
 #include "util/macro.h"
 
-#define PI 3.141593f
-
 namespace cuboc {
 
 void calcDiffs(
@@ -153,9 +151,13 @@ glm::vec3 calcDirXY(float xoff, float yoff) {
 glm::vec3 crossProduct(glm::vec3 p1, glm::vec3 p2) {
   glm::vec3 cp;
   cp[0] = p1[1] * p2[2] - p1[2] * p2[1];
-  cp[1] = p1[0] * p2[2] - p1[2] * p2[0];
+  cp[1] = p1[2] * p2[0] - p1[0] * p2[2];
   cp[2] = p1[0] * p2[1] - p1[1] * p2[0];
   return cp;
+}
+
+float dotProduct(glm::vec3 p1, glm::vec3 p2) {
+  return p1[0] * p2[0] + p1[1] * p2[1] + p1[2] * p2[2];
 }
 
 glm::vec3 solve(glm::mat3 m, glm::vec3 b) {
@@ -194,7 +196,7 @@ glm::vec3 solve(glm::mat3 m, glm::vec3 b) {
     }
   }
 
-  /*
+  
   std::printf("l:\n");
   std::printf("%.2f,%.2f,%.2f\n", l[0][0], l[0][1], l[0][2]);
   std::printf("%.2f,%.2f,%.2f\n", l[1][0], l[1][1], l[1][2]);
@@ -203,7 +205,7 @@ glm::vec3 solve(glm::mat3 m, glm::vec3 b) {
   std::printf("%.2f,%.2f,%.2f\n", u[0][0], u[0][1], u[0][2]);
   std::printf("%.2f,%.2f,%.2f\n", u[1][0], u[1][1], u[1][2]);
   std::printf("%.2f,%.2f,%.2f\n", u[2][0], u[2][1], u[2][2]);
-  */
+  
 
   glm::vec3 y;
   for(int i = 0; i < 3; i++){

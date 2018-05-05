@@ -8,6 +8,8 @@
 
 #include "util/log.h"
 
+#define PI 3.141593f
+
 namespace cuboc {
 
 void calcDiffs(
@@ -45,6 +47,8 @@ float distPlane(
     glm::vec3 dir);
 
 glm::vec3 crossProduct(glm::vec3 p1, glm::vec3 p2);
+
+float dotProduct(glm::vec3 p1, glm::vec3 p2);
 
 glm::vec3 solve(glm::mat3 m, glm::vec3 b);
 

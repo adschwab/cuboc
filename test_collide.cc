@@ -10,15 +10,17 @@
 struct printer {
 
   bool operator()(int x, int y, int z) {
-    std::printf("%d,%d,%d\n", x, y, z);
+    //std::printf("%d,%d,%d\n", x, y, z);
     
-    return true;
+    if (x == 1 && y == 1 && z == 0)
+      return true;
+    return false;
   }
 };
 
 int main() {
 
-  glm::vec3 pos(0.3f, 0.1f, 0.1f);
+  glm::vec3 pos(0.4f, 0.35f, 0.1f);
   glm::vec3 dir(1.0f, 1.0f, 0.0f);
   dir = glm::normalize(dir);
 
@@ -32,6 +34,6 @@ int main() {
   pos[0] += diffs[0];
   pos[1] += diffs[1];
   pos[2] += diffs[2];  
-  std::printf("%.2f\n -> (%.2f, %.2f, %.2f)\n", new_dist, pos[0], pos[1], pos[2]);
+  std::printf("%.2f -> (%.2f, %.2f, %.2f)\n", new_dist, pos[0], pos[1], pos[2]);
   return 0;
 }
