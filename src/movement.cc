@@ -174,10 +174,10 @@ void Movement::check(
         distf = std::min(distf, distPlane(false, 1, ynear + World::block_size, pos, dir));
       }
 
-      LOGF("([%d, %d] - [%.2f, %.2f]) -> %.2f, %.2f: %.2f", section.x(), section.y(),  pos[0], pos[1], xdiff, ydiff, distf);
+      //LOGF("([%d, %d] - [%.2f, %.2f]) -> %.2f, %.2f: %.2f", section.x(), section.y(),  pos[0], pos[1], xdiff, ydiff, distf);
       
-      xdiff = distf * xdiff / dist;
-      ydiff = distf * ydiff / dist;
+      //xdiff = distf * xdiff / dist;
+      //ydiff = distf * ydiff / dist;
 
       
       break;
