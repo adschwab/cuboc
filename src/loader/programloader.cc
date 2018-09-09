@@ -40,6 +40,13 @@ void ProgramLoader::setMatrix(
   glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
+void ProgramLoader::setVec(
+    const std::string &name,
+    glm::vec3 vec) const {
+  GLint loc = glGetUniformLocation(progid, name.c_str());
+  glUniform3f(loc, vec[0], vec[1], vec[2]);
+}
+
 std::string ProgramLoader::load(GLuint& program) {
   GLuint vertex;
   GLuint fragment;
