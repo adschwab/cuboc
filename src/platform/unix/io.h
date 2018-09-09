@@ -1,8 +1,6 @@
 #ifndef PLATFORM_IO_H
 #define PLATFORM_IO_H
 
-#ifdef _UNIX
-
 #include <vector>
 #include <string>
 #include <memory>
@@ -49,10 +47,5 @@ inline std::string filename(std::string path) {
 }
 
 } // namespace io_funcs
-
-
-
-
-#endif // _UNIX
 
 #endif // inclusion guard

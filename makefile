@@ -2,7 +2,7 @@ CC=g++
 GLFW=-lglfw
 GL=-lGLEW -framework OpenGL
 OBJ=obj
-CPPFLAGS=-std=c++11 -I./$(OBJ) -D_UNIX
+CPPFLAGS=-std=c++11 -I./$(OBJ) -DPLATFORM=_UNIX
 
 
 CXX_SRC_FILES=$(shell find src ! -name "test_*.cc" -name "*.cc")

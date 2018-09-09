@@ -1,0 +1,15 @@
+target_sources(
+  cuboc
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/math_util.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/math_util.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/section.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/store.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/log.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/cache.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/hashalg.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/hashalg.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/hashkey.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/macro.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/section_util.h
+)

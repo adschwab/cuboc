@@ -31,11 +31,9 @@ World::World(
     _program(program),
     _tex_atlas(atlas),
     _camera(camera),
-    _render_dist(render_dist) {
+    _render_dist(render_dist),
+    _draw_cache(CUBE(DEFAULT_RENDER_DIST * 2 + 1) * 2 + 1) {
   
-  _raw = std::make_shared<util::Cache<XYZCoord, std::shared_ptr<BaseSection<Block> > > >();
-  _draw_cache = std::make_shared<util::Cache<XYZCoord, DrawableSection > > (CUBE(DEFAULT_RENDER_DIST * 2 + 1) * 2 + 1);
-
   std::shared_ptr<Section<Block> > test_section = std::make_shared<Section<Block> > ();
   test_section->set(Block(BLOCK_BOX), 0, 0, 0);
   test_section->set(Block(BLOCK_BOX), 0, 0, 1);
@@ -46,11 +44,11 @@ World::World(
   test_section->set(Block(BLOCK_BOX), 0, 1, 1);
   test_section->set(Block(BLOCK_BOX), 1, 1, 1);
 
-  _raw->add(XYZCoord(1, 1, 0), test_section);
+  _raw.add(XYZCoord(1, 1, 0), test_section);
   DrawableSection drawable(test_section.get(), BLOCK_SIZE);
-  _draw_cache->add(XYZCoord(1, 1, 0), drawable);
+  _draw_cache.add(XYZCoord(1, 1, 0), drawable);
   
-  /*
+  
   std::shared_ptr<Section<Block> > test_section2 = std::make_shared<Section<Block> > ();
   test_section2->set(Block(BLOCK_EARTH), 0, 0, 0);
   test_section2->set(Block(BLOCK_EARTH), 0, 0, 1);
@@ -60,10 +58,10 @@ World::World(
   test_section2->set(Block(BLOCK_EARTH), 1, 0, 1);
   test_section2->set(Block(BLOCK_EARTH), 0, 1, 1);
   test_section2->set(Block(BLOCK_EARTH), 1, 1, 1);
-  _raw->add(XYZCoord(1, 0, 0), test_section2);
+  _raw.add(XYZCoord(1, 0, 0), test_section2);
   DrawableSection drawable2(test_section2.get(), BLOCK_SIZE);
-  _draw_cache->add(XYZCoord(1, 0, 0), drawable2);
-  */
+  _draw_cache.add(XYZCoord(1, 0, 0), drawable2);
+  
 }
 
 void World::draw() {
@@ -78,7 +76,7 @@ void World::draw() {
             coord_pos.x() + i,
             coord_pos.y() + j,
             coord_pos.z() + k);
-        DrawableSection *drawable = _draw_cache->get(coord);
+        DrawableSection *drawable = _draw_cache.get(coord);
         if (drawable == nullptr) continue;
         float x_off = (coord_pos.x() - coord.x()) * 
             World::section_edge;
@@ -97,7 +95,7 @@ void World::draw() {
 }
 
 util::Store<XYZCoord, std::shared_ptr<BaseSection<Block> > > *World::get_raw() {
-  return _raw.get();
+  return &_raw;
 }
 
 } // namespace cuboc

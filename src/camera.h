@@ -31,6 +31,7 @@ class Camera {
   Camera(
       base::Window *window,
       glm::vec3 pos_init,
+      XYZCoord pos_section,
       float xy_angle,
       float yz_angle,
       float sensitivity=DEFAULT_SENSITIVITY,

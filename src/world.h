@@ -44,10 +44,8 @@ class World {
   unsigned char _render_dist;
   Camera *_camera;
 
-  std::shared_ptr<util::Cache<XYZCoord, std::shared_ptr<BaseSection<Block> > > >
-      _raw;
-  std::shared_ptr<util::Cache<XYZCoord, DrawableSection > >
-      _draw_cache;
+  util::Cache<XYZCoord, std::shared_ptr<BaseSection<Block> > > _raw;
+  util::Cache<XYZCoord, DrawableSection > _draw_cache;
 };
 
 }

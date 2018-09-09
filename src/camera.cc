@@ -16,7 +16,8 @@ namespace cuboc {
 
 Camera::Camera(
     base::Window *window,
-    glm::vec3 pos_init, 
+    glm::vec3 pos_init,
+    XYZCoord pos_section, 
     float xy_angle,
     float yz_angle,
     float sensitivity,
@@ -24,7 +25,7 @@ Camera::Camera(
     float width_ang):
       _window(window),
       _pos(pos_init),
-      _section(XYZCoord(0, 0, 0)),
+      _section(pos_section),
       _xy(xy_angle),
       _yz(yz_angle), 
       _root_forward(glm::vec3(0.0f, 0.0f, 1.0f)),

@@ -31,9 +31,9 @@ double mouseY = window.getHeight()/2;
 bool mouse_set = false;
 
 glm::vec3 cam_pos = glm::vec3(0.0f, 0.5f, 0.0f);
-XYZCoord cam_ind();
+XYZCoord cam_ind(0, 0, 0);
 
-cuboc::Camera camera(&window, cam_pos, 3.14f/2.0f, 0.0f);
+cuboc::Camera camera(&window, cam_pos, cam_ind, 3.14f/2.0f, 0.0f);
 cuboc::Movement movement(&camera);
 
 static void err_callback(
@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
     
     GLfloat time = glfwGetTime();
     GLfloat render_time = time - lap_time;
-    lap_time = time; 
+    lap_time = time;
 
     if (window.getFocus() && render_time > loop_time) {
       std::printf("Render took too long: %.3f\n",
