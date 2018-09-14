@@ -72,16 +72,11 @@ std::string ProgramLoader::load(GLuint& program) {
   glLinkProgram(program);
 
 
-  glGetProgramiv(program, GL_VALIDATE_STATUS, &success);
-  if (!success)
-    glGetProgramInfoLog(program, 512, NULL, error);
-    return std::string("Error linking shaders: ") + std::string(error);
-  
   glGetProgramiv(program, GL_LINK_STATUS, &success);
-  if (!success)
+  if (!success) {
     glGetProgramInfoLog(program, 512, NULL, error);
     return std::string("Error linking shaders: ") + std::string(error);
-
+  }
 
   glDeleteShader(vertex);
   glDeleteShader(fragment);

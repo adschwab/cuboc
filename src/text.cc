@@ -10,10 +10,10 @@ void DrawText::draw(std::string str, float left, float top, float pt) {
   text_img_.set(img_program_); 
   
   std::vector<float> vertices = {
-      left, top,
-      left + pt, top,
-      left + pt, top - pt,
-      left, top - pt};
+      left, top, 0.0f, 0.0f,
+      left + pt, top, 0.0f, 1.0f,
+      left + pt, top - pt, 1.0f, 1.0f,
+      left, top - pt, 1.0f, 0.0f};
   
   std::vector<unsigned char> indices = {
       0, 1, 2,
