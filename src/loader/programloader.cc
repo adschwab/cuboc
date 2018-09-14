@@ -89,7 +89,7 @@ GLint ProgramLoader::load_shader(std::string file_name, GLenum shadertype, GLuin
   const std::string fstr = utils::loadFromFile(file_name); 
 
   const char *fcstr = fstr.c_str();
-  LOGF("%s", fcstr);
+  //LOGF("%s", fcstr);
 
   shader = glCreateShader(shadertype);
 

@@ -24,16 +24,15 @@ TextureLoader::TextureLoader(std::string filename, bool is_tex) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texId);
 
-  if (is_tex) {
-    glTexParameteri(GL_TEXTURE_2D,
-        GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D,
-        GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D,
-        GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,
-        GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  }
+
+  glTexParameteri(GL_TEXTURE_2D,
+      GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,
+      GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D,
+      GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D,
+      GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   Loader::Image texImg = 
       Loader::Image(filename, 3);
