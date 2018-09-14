@@ -39,7 +39,7 @@ class Movement {
   void check(
       XYZCoord section,
       glm::vec3 raw_pos, // <x, z, y>
-      float &xdiff, float &ydiff,
+      float &xdiff, float &ydiff, float &zdiff,
       util::Store<XYZCoord, std::shared_ptr<BaseSection<Block> > > *world);
   
   Camera *cam;

@@ -10,7 +10,7 @@
 class TextureLoader {
 
   public:
-  TextureLoader(std::string filename);
+  TextureLoader(std::string filename, bool is_tex);
   
   void set(graphicsutils::ProgramLoader *program);
 

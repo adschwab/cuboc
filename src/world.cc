@@ -36,13 +36,13 @@ World::World(
   
   std::shared_ptr<Section<Block> > test_section = std::make_shared<Section<Block> > ();
   test_section->set(Block(BLOCK_BOX), 0, 0, 0);
-  test_section->set(Block(BLOCK_BOX), 0, 0, 1);
-  test_section->set(Block(BLOCK_BOX), 0, 1, 0);
-  test_section->set(Block(BLOCK_BOX), 1, 0, 0);
-  test_section->set(Block(BLOCK_BOX), 1, 1, 0);
-  test_section->set(Block(BLOCK_BOX), 1, 0, 1);
-  test_section->set(Block(BLOCK_BOX), 0, 1, 1);
-  test_section->set(Block(BLOCK_BOX), 1, 1, 1);
+  //test_section->set(Block(BLOCK_BOX), 0, 0, 1);
+  //test_section->set(Block(BLOCK_BOX), 0, 1, 0);
+  //test_section->set(Block(BLOCK_BOX), 1, 0, 0);
+  //test_section->set(Block(BLOCK_BOX), 1, 1, 0);
+  //test_section->set(Block(BLOCK_BOX), 1, 0, 1);
+  //test_section->set(Block(BLOCK_BOX), 0, 1, 1);
+  //test_section->set(Block(BLOCK_BOX), 1, 1, 1);
 
   _raw.add(XYZCoord(1, 1, 0), test_section);
   DrawableSection drawable(test_section.get(), BLOCK_SIZE);

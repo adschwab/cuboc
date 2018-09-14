@@ -8,6 +8,7 @@
 #include <GL/glew.h>
 
 #include "util/loadfile.h"
+#include "util/log.h"
 
 namespace graphicsutils {
   
@@ -21,6 +22,10 @@ ProgramLoader::ProgramLoader(std::string v_glsl, std::string f_glsl) : v_file(v_
 
 void ProgramLoader::use() {
   glUseProgram(progid);
+}
+
+void ProgramLoader::done() {
+  glUseProgram(0);
 }
 
 void ProgramLoader::setInt(const std::string &name, int value) const {
@@ -62,12 +67,21 @@ std::string ProgramLoader::load(GLuint& program) {
   program = glCreateProgram();
   
   glAttachShader(program, vertex);
+
   glAttachShader(program, fragment);
   glLinkProgram(program);
 
+
+  glGetProgramiv(program, GL_VALIDATE_STATUS, &success);
+  if (!success)
+    glGetProgramInfoLog(program, 512, NULL, error);
+    return std::string("Error linking shaders: ") + std::string(error);
+  
   glGetProgramiv(program, GL_LINK_STATUS, &success);
   if (!success)
+    glGetProgramInfoLog(program, 512, NULL, error);
     return std::string("Error linking shaders: ") + std::string(error);
+
 
   glDeleteShader(vertex);
   glDeleteShader(fragment);
@@ -78,7 +92,9 @@ std::string ProgramLoader::load(GLuint& program) {
 GLint ProgramLoader::load_shader(std::string file_name, GLenum shadertype, GLuint& shader) {
   
   const std::string fstr = utils::loadFromFile(file_name); 
+
   const char *fcstr = fstr.c_str();
+  LOGF("%s", fcstr);
 
   shader = glCreateShader(shadertype);
 

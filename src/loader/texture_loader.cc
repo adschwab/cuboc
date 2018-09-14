@@ -12,7 +12,8 @@
 #include "loader/programloader.h"
 #include "util/split.h"
 
-TextureLoader::TextureLoader(std::string filename) {
+
+TextureLoader::TextureLoader(std::string filename, bool is_tex) {
 
   if (glewInit() != GLEW_OK) {
     std::fprintf(stderr,
@@ -23,14 +24,16 @@ TextureLoader::TextureLoader(std::string filename) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texId);
 
-  glTexParameteri(GL_TEXTURE_2D,
-      GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D,
-      GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D,
-      GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D,
-      GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  if (is_tex) {
+    glTexParameteri(GL_TEXTURE_2D,
+        GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+        GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+        GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,
+        GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  }
 
   Loader::Image texImg = 
       Loader::Image(filename, 3);
@@ -40,7 +43,9 @@ TextureLoader::TextureLoader(std::string filename) {
       texImg.getWidth(),
       texImg.getHeight(),
       0, GL_RGB, GL_UNSIGNED_BYTE, data);
-  glGenerateMipmap(GL_TEXTURE_2D);
+  if (is_tex) {
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -75,7 +80,7 @@ TextureFactory::TextureFactory(std::string foldername) {
         filename.size() - ext_index);
     std::printf("LOADING %s\n", key.c_str());
       
-    TextureLoader texture(name);
+    TextureLoader texture(name, true);
     _textures.insert(std::make_pair(key, texture));
   }
 }

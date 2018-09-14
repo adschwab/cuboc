@@ -12,8 +12,10 @@
 #include "movement.h"
 #include "loader/programloader.h"
 #include "loader/texture_loader.h"
+#include "text.h"
 #include "world.h"
 #include "util/hashkey.h"
+#include "util/log.h"
 
 int target_fps = 30;
 GLfloat loop_time = 1/(float)target_fps;
@@ -37,6 +39,7 @@ cuboc::Camera camera(&window, cam_pos, cam_ind, 3.14f/2.0f, 0.0f);
 cuboc::Movement movement(&camera);
 
 glm::vec3 fogColor(197.0f/256.0f, 210.0f/256.0f, 209.0f/256.0f);
+
 
 static void err_callback(
     int error,
@@ -106,9 +109,16 @@ void initGL() {
   program->use();
   program->setVec("fogColor", fogColor);
   programs.push_back(program);
+  
+  std::shared_ptr<graphicsutils::ProgramLoader> img_program =
+      std::make_shared<graphicsutils::ProgramLoader> (
+          "shaders/vertex_img.glsl",
+          "shaders/fragment_img.glsl");
+  programs.push_back(img_program);
   // ---------------- GENERATE RECTANGLE -----------------
   world = new cuboc::World(static_cast<graphicsutils::Program3d *>(programs[0].get()), tex_factory.get("grounds_atlas"), &camera);
   //box = new Box(programs[0].get(), &tex_factory);
+
 }
 
 int main(int argc, char** argv) {
@@ -123,6 +133,8 @@ int main(int argc, char** argv) {
   GLfloat lap_time = glfwGetTime();
   glEnable(GL_MULTISAMPLE);
 
+  DrawText text(programs[1].get());
+
   std::printf("Running\n");
   while (window.run()) {
     movement.updatePosition(world->get_raw());
@@ -130,7 +142,9 @@ int main(int argc, char** argv) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     world->draw();
-    glUseProgram(0);
+    
+    text.draw("hello", -1.0f, 0.0f, 0.5f);
+    graphicsutils::ProgramLoader::done();
     
     GLfloat time = glfwGetTime();
     GLfloat render_time = time - lap_time;

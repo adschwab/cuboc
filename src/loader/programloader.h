@@ -15,6 +15,8 @@ class ProgramLoader {
   ProgramLoader(std::string v_glsl, std::string f_glsl);
 
   virtual void use();
+  
+  static void done();
 
   void setInt(const std::string &name, int value) const;
   void setFloat(const std::string &name, float value) const;

@@ -1,5 +1,5 @@
 #version 330 core
-out vec4 color;
+out vec4 oColor;
 
 in vec2 texCoords;
 
@@ -7,6 +7,6 @@ uniform sampler2D texture1;
 
 void main()
 {
-  color = texture(texture1, texCoords);
+  oColor = texture(texture1, texCoords);
 }
 

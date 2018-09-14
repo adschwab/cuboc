@@ -67,11 +67,13 @@ void Movement::updatePosition(util::Store<XYZCoord, std::shared_ptr<BaseSection<
     xdiff += -speed * diff * backward * glm::sin(cam->getXY());
   }
 
+  float zdiff = 0.0f;
   check(
       pos.section,
       pos.offset,
       xdiff,
       ydiff,
+      zdiff,
       world);
 
 
@@ -112,78 +114,45 @@ void Movement::updatePosition(util::Store<XYZCoord, std::shared_ptr<BaseSection<
 void Movement::check(
     XYZCoord section,
     glm::vec3 raw_pos,
-    float &xdiff, float &ydiff,
+    float &xdiff, float &ydiff, float &zdiff,
     util::Store<XYZCoord, std::shared_ptr<BaseSection<Block> > > *store) {
  
   Block block;
-  glm::vec3 pos(
-      raw_pos[0],
-      raw_pos[2],
-      raw_pos[1]);
-  glm::vec3 dir = calcDirXY(xdiff, ydiff);
+  std::array<int, 3> offset;
+  float min_dist = BLOCK_SIZE;
+  float dist = std::sqrt(SQUARE(xdiff) + SQUARE(ydiff) + SQUARE(zdiff));
+  if (dist < min_dist)
+    min_dist = dist;
   
+  int xsgn = xdiff >= 0 ? 1 : -1;
+  int ysgn = ydiff >= 0 ? 1 : -1;
+  int zsgn = zdiff >= 0 ? 1 : -1;
 
 
-  std::vector<std::array<int, 3> > offsets;
-  float dist = std::sqrt(SQUARE(xdiff) + SQUARE(ydiff));
-  walkLine(pos, dir, dist, World::block_size, offsets);
-  //LOGF("x: %.2f, y: %.2f -> (%.2f, %.2f, %.2f)", xdiff, ydiff, dir[0], dir[1], dir[2]);
-  
-  for (int i = 0; i < offsets.size(); i ++) {
-    std::array<int, 3> offset = offsets[i];
-
+  for (char i = 0; i < 8; i ++) {
+    
+    offset[0] = xsgn * (i & 1);
+    offset[1] = ysgn * ((i >> 1) & 1);
+    offset[2] = zsgn * ((i >> 2) & 1);
+    //LOGF("%d, %d, %d", offset[0], offset[1], offset[2]);
     bool found = get_block(
         store,
         section,
         World::section_count,
         offset,
         block);
-    if (found && block.getType() != BLOCK_AIR) {
-
-      float xnear = World::getSubOffset(offset[0]);
-      float ynear = World::getSubOffset(offset[1]);
-      if (std::abs(xnear - pos[0]) < MIN_DIST && xdiff > 0.0f) {
-        xdiff = 0.0f;
-        return;
-      }
-      else if (std::abs(xnear + World::block_size - pos[0]) < MIN_DIST && xdiff < 0.0f) {
-        xdiff = 0.0f;
-        return;
-      }
-      if (std::abs(ynear - pos[1]) < MIN_DIST && ydiff > 0.0f) {
-        ydiff = 0.0f;
-        return;
-      }
-      else if (std::abs(ynear + World::block_size - pos[1]) < MIN_DIST && ydiff < 0.0f) {
-        ydiff = 0.0f;
-        return;
-      }
-      float distf = MAX_DIST;
-
-      if (xdiff > 0.0f) {
-        distf = std::min(distf, distPlane(true, 0, xnear, pos, dir));
-      }
-      else if (xdiff < 0.0f) {
-        distf = std::min(distf, distPlane(false, 0, xnear + World::block_size, pos, dir));
-
-      }
-      if (ydiff > 0.0f) {
-        distf = std::min(distf, distPlane(true, 1, ynear, pos, dir));
-      }
-      else if (ydiff < 0.0f) {
-        distf = std::min(distf, distPlane(false, 1, ynear + World::block_size, pos, dir));
-      }
-
-      //LOGF("([%d, %d] - [%.2f, %.2f]) -> %.2f, %.2f: %.2f", section.x(), section.y(),  pos[0], pos[1], xdiff, ydiff, distf);
+    if (found) {
+      float xfacenear = (float)offset[0] * BLOCK_SIZE;
+      float yfacenear = (float)offset[1] * BLOCK_SIZE;
+      float zfacenear = (float)offset[2] * BLOCK_SIZE;
+      //LOGF("%f, %f, %f", raw_pos[0], raw_pos[1], raw_pos[2]);
       
-      //xdiff = distf * xdiff / dist;
-      //ydiff = distf * ydiff / dist;
-
-      
-      break;
+      //LOGF("%f, %f, %f", xfacenear, yfacenear, zfacenear);
+      // Check faces
+      // Check edges
+      // check points
     }
-  }
-
+  }  
 }
 
 } // namespace
