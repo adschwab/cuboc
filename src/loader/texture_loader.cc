@@ -11,7 +11,7 @@
 #include "loader/image_loader.h"
 #include "loader/programloader.h"
 #include "util/split.h"
-
+#include "util/log.h"
 
 TextureLoader::TextureLoader(std::string filename, bool is_tex) {
 
@@ -35,13 +35,13 @@ TextureLoader::TextureLoader(std::string filename, bool is_tex) {
       GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   Loader::Image texImg = 
-      Loader::Image(filename, 3);
+      Loader::Image(filename, 4);
   void *data = (void *)texImg.getBuffer();
   glTexImage2D(GL_TEXTURE_2D, 0,
-      GL_RGB,
+      GL_RGBA,
       texImg.getWidth(),
       texImg.getHeight(),
-      0, GL_RGB, GL_UNSIGNED_BYTE, data);
+      0, GL_RGBA, GL_UNSIGNED_BYTE, data);
   if (is_tex) {
     glGenerateMipmap(GL_TEXTURE_2D);
   }

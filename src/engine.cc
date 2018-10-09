@@ -132,7 +132,8 @@ int main(int argc, char** argv) {
   initGL();
   GLfloat lap_time = glfwGetTime();
   glEnable(GL_MULTISAMPLE);
-
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   DrawText text(programs[1].get());
 
   std::printf("Running\n");
@@ -143,7 +144,7 @@ int main(int argc, char** argv) {
     glEnable(GL_DEPTH_TEST);
     world->draw();
     
-    text.draw("hello", -1.0f, 0.0f, 0.5f);
+    text.draw("HELLO WORLD", -0.9f, 0.9f, 0.1f, window.aspectRatio());
     graphicsutils::ProgramLoader::done();
     
     GLfloat time = glfwGetTime();

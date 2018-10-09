@@ -11,7 +11,7 @@ class DrawText {
  public:
   DrawText(graphicsutils::ProgramLoader *img_program);
   
-  void draw(std::string str, float left, float top, float pt);
+  void draw(std::string str, float left, float top, float pt, float aspectRatio);
  
  private:
   graphicsutils::ProgramLoader *img_program_;

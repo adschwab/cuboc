@@ -78,4 +78,8 @@ namespace base {
   int Window::getHeight() {
     return _height;
   }
+
+  float Window::aspectRatio() {
+    return (float)_width / (float) _height;
+  }
 } // namespace
