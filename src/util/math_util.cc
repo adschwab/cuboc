@@ -27,7 +27,7 @@ void walkLine(
     const glm::vec3 pos,
     const glm::vec3 dir, // This is assumed to be normalized
     float dist, float size,
-    std::vector<std::array<int, 3> > &offsets) {
+    std::function<bool(std::array<int, 3>)> func) {
   dist = dist / size;
 
   float gx0 = pos[0] / size;
@@ -83,7 +83,7 @@ void walkLine(
   float derrz = (float)sz * vxvy;
 
   while (true) {
-    offsets.push_back({gx, gy, gz});
+    if (!func({gx, gy, gz})) break;
     if (gx == gx1idx && gy == gy1idx && gz == gz1idx) break;
 
     //Which plane do we cross first?

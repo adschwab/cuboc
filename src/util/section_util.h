@@ -32,6 +32,21 @@ bool get_block(
   return true;
 }
 
+bool get_block_raw(
+    util::Store<XYZCoord, std::shared_ptr<BaseSection<Block> > > *store,
+    XYZCoord section,
+    int edge, float block_size,
+    float xraw, float yraw, float zraw,
+    Block &block) {
+
+  std::array<int, 3> offset;
+  offset[0] = xraw / block_size;
+  offset[1] = yraw / block_size;
+  offset[2] = zraw / block_size;
+
+  return get_block(store, section, edge, offset, block);
+}
+
 }
 
 #endif

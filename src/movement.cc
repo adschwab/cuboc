@@ -119,11 +119,17 @@ void Movement::check(
  
   Block block;
   std::array<int, 3> offset;
-  float min_dist = BLOCK_SIZE;
   float dist = std::sqrt(SQUARE(xdiff) + SQUARE(ydiff) + SQUARE(zdiff));
-  if (dist < min_dist)
-    min_dist = dist;
-  
+
+ if (dist > BLOCK_SIZE) {
+    xdiff = xdiff * BLOCK_SIZE / dist;
+    ydiff = ydiff * BLOCK_SIZE / dist;
+    zdiff = zdiff * BLOCK_SIZE / dist;
+  }
+  float new_x = raw_pos[0] + xdiff;
+  float new_y = raw_pos[2] + ydiff;
+  float new_z = raw_pos[1] + zdiff;
+
   int xsgn = xdiff >= 0 ? 1 : -1;
   int ysgn = ydiff >= 0 ? 1 : -1;
   int zsgn = zdiff >= 0 ? 1 : -1;
@@ -131,26 +137,21 @@ void Movement::check(
 
   for (char i = 0; i < 8; i ++) {
     
-    offset[0] = xsgn * (i & 1);
-    offset[1] = ysgn * ((i >> 1) & 1);
-    offset[2] = zsgn * ((i >> 2) & 1);
-    //LOGF("%d, %d, %d", offset[0], offset[1], offset[2]);
-    bool found = get_block(
+    float x = new_x + xsgn * (i & 1);
+    float y = new_y + ysgn * ((i >> 1) & 1);
+    float z = new_z + zsgn * ((i >> 2) & 1);
+    
+    bool found = get_block_raw(
         store,
         section,
         World::section_count,
-        offset,
+        BLOCK_SIZE,
+        x, y, z,
         block);
-    if (found) {
-      float xfacenear = (float)offset[0] * BLOCK_SIZE;
-      float yfacenear = (float)offset[1] * BLOCK_SIZE;
-      float zfacenear = (float)offset[2] * BLOCK_SIZE;
-      //LOGF("%f, %f, %f", raw_pos[0], raw_pos[1], raw_pos[2]);
-      
-      //LOGF("%f, %f, %f", xfacenear, yfacenear, zfacenear);
-      // Check faces
-      // Check edges
-      // check points
+    if (found && block.getType() != BLOCK_AIR) {
+      xdiff = 0.0f;
+      ydiff = 0.0f;
+      zdiff = 0.0f;
     }
   }  
 }

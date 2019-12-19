@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <array>
+#include <functional>
 
 #include <glm/glm.hpp>
 
@@ -30,7 +31,7 @@ void walkLine(
     const glm::vec3 pos,
     const glm::vec3 dir, // This is assumed to be normalized
     float dist, float size,
-    std::vector<std::array<int, 3> > &offsets);
+    std::function<bool(std::array<int, 3>)> func);
 
 
 /*

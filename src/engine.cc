@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
     glEnable(GL_DEPTH_TEST);
     world->draw();
     
-    text.draw("HELLO WORLD", -0.9f, 0.9f, 0.1f, window.aspectRatio());
+    //text.draw("HELLO WORLD", -0.9f, 0.9f, 0.1f, window.aspectRatio());
     graphicsutils::ProgramLoader::done();
     
     GLfloat time = glfwGetTime();
